@@ -15,7 +15,9 @@ export class HudScene extends Phaser.Scene {
     reg.events.on('changedata-health',    () => this.refresh());
     reg.events.on('changedata-maxHealth', () => this.layout());
     reg.events.on('changedata-pollen',    () => this.refresh());
-    reg.events.on('changedata-abilities', () => this.refresh());
+    // Re-layout on ability changes so the BASH touch button appears once the
+    // player picks up shell-bash.
+    reg.events.on('changedata-abilities', () => this.layout());
 
     this.scale.on('resize', () => this.layout());
     this.refresh();
@@ -61,19 +63,25 @@ export class HudScene extends Phaser.Scene {
   // the registry, which GameScene reads each frame.
   makeTouchControls(width, height) {
     const touch = this.registry.get('touchInput');
+    const abilities = this.registry.get('abilities') ?? new Set();
 
     // Movement (bottom-left)
     this.makeBtn(70,  height - 70, 46, '◀', 0x4a8acc, v => touch.left  = v);
     this.makeBtn(180, height - 70, 46, '▶', 0x4a8acc, v => touch.right = v);
 
     // Actions (bottom-right)
-    this.makeBtn(width - 80,  height - 90, 56, '▲',     0x80c060, v => touch.jump   = v);  // jump (largest, primary)
-    this.makeBtn(width - 200, height - 70, 42, 'BASH',  0xc06040, v => touch.dash   = v);
-    this.makeBtn(width - 90,  height - 210, 38, 'RUN',  0xcca050, v => touch.sprint = v);
+    this.makeBtn(width - 80,  height - 90, 56, '▲',    0x80c060, v => touch.jump   = v);
+    this.makeBtn(width - 90,  height - 210, 38, 'RUN', 0xcca050, v => touch.sprint = v);
+
+    // BASH only appears once the player has unlocked shell-bash. Until then
+    // there's nothing to dash with, so showing the button would be confusing.
+    if (abilities.has('shellBash')) {
+      this.makeBtn(width - 200, height - 70, 42, 'BASH', 0xc06040, v => touch.dash = v);
+    }
 
     // Utility (top-right)
-    this.makeBtn(width - 50,  44, 28, 'M',   0x707080, null, () => this.openMap());
-    this.makeBtn(width - 110, 44, 28, '‖',   0x707080, null, () => this.openPause());
+    this.makeBtn(width - 50,  44, 28, 'M', 0x707080, null, () => this.openMap());
+    this.makeBtn(width - 110, 44, 28, '‖', 0x707080, null, () => this.openPause());
   }
 
   // setFlag = function called with true on down / false on up — used for

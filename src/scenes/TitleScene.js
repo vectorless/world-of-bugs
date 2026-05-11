@@ -16,7 +16,7 @@ export class TitleScene extends Phaser.Scene {
       fontFamily: 'monospace', fontSize: '16px', color: '#8aa070'
     }).setOrigin(0.5);
 
-    this.add.text(cx, cy + 40, 'Press SPACE to start', {
+    this.add.text(cx, cy + 40, 'Tap or press SPACE to start', {
       fontFamily: 'monospace', fontSize: '20px', color: '#ffffff'
     }).setOrigin(0.5);
 
@@ -26,9 +26,11 @@ export class TitleScene extends Phaser.Scene {
 
     this.scale.on('resize', () => this.scene.restart());
 
-    this.input.keyboard.once('keydown-SPACE', () => {
+    const start = () => {
       this.scene.start('GameScene');
       this.scene.launch('HudScene');
-    });
+    };
+    this.input.keyboard.once('keydown-SPACE', start);
+    this.input.once('pointerdown', start);
   }
 }
