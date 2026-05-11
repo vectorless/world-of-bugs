@@ -9,13 +9,23 @@ export class PauseScene extends Phaser.Scene {
     this.add.text(width / 2, height / 2 - 20, 'PAUSED', {
       fontFamily: 'monospace', fontSize: '36px', color: '#ffffff'
     }).setOrigin(0.5);
-    this.add.text(width / 2, height / 2 + 30, 'Press ESC to resume', {
+    this.add.text(width / 2, height / 2 + 30, 'Tap or press ESC to resume', {
       fontFamily: 'monospace', fontSize: '16px', color: '#9aa090'
     }).setOrigin(0.5);
 
-    this.input.keyboard.once('keydown-ESC', () => {
+    const resume = () => {
+      // Clear any latched touch-button state so a tap that lands on a HUD
+      // button doesn't leave a flag stuck "on" when the game resumes.
+      const touch = this.registry.get('touchInput');
+      if (touch) {
+        touch.left = touch.right = false;
+        touch.jump = touch.dash = touch.sprint = false;
+      }
       this.scene.stop();
       this.scene.resume('GameScene');
-    });
+    };
+
+    this.input.keyboard.once('keydown-ESC', resume);
+    this.input.once('pointerdown', resume);
   }
 }

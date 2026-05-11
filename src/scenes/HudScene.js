@@ -65,23 +65,40 @@ export class HudScene extends Phaser.Scene {
     const touch = this.registry.get('touchInput');
     const abilities = this.registry.get('abilities') ?? new Set();
 
-    // Movement (bottom-left)
-    this.makeBtn(70,  height - 70, 46, '◀', 0x4a8acc, v => touch.left  = v);
-    this.makeBtn(180, height - 70, 46, '▶', 0x4a8acc, v => touch.right = v);
+    // Scale button sizes to the shorter screen dimension so phone-sized
+    // viewports get smaller buttons that don't overlap. iPad (~768px short
+    // side) gets full-size buttons; phone (~375px) gets compact ones.
+    const base = Math.min(width, height);
+    const r     = Math.max(26, Math.min(48, Math.floor(base / 16)));
+    const big   = Math.floor(r * 1.18);
+    const small = Math.floor(r * 0.78);
+    const util  = Math.max(20, Math.floor(r * 0.62));
+    const pad   = Math.max(12, Math.floor(r * 0.42));
 
-    // Actions (bottom-right)
-    this.makeBtn(width - 80,  height - 90, 56, '▲',    0x80c060, v => touch.jump   = v);
-    this.makeBtn(width - 90,  height - 210, 38, 'RUN', 0xcca050, v => touch.sprint = v);
+    // Movement (bottom-left) — two side-by-side buttons
+    const moveY  = height - r - pad;
+    const leftX  = r + pad;
+    const rightX = leftX + r * 2 + Math.max(10, Math.floor(r * 0.3));
+    this.makeBtn(leftX,  moveY, r, '◀', 0x4a8acc, v => touch.left  = v);
+    this.makeBtn(rightX, moveY, r, '▶', 0x4a8acc, v => touch.right = v);
 
-    // BASH only appears once the player has unlocked shell-bash. Until then
-    // there's nothing to dash with, so showing the button would be confusing.
+    // Actions (bottom-right) — jump is the anchor; sprint above it, bash to its left
+    const jumpX = width - big - pad;
+    const jumpY = height - big - pad;
+    this.makeBtn(jumpX, jumpY, big, '▲', 0x80c060, v => touch.jump = v);
+
+    const sprintY = jumpY - big - small - 8;
+    this.makeBtn(jumpX, sprintY, small, 'RUN', 0xcca050, v => touch.sprint = v);
+
     if (abilities.has('shellBash')) {
-      this.makeBtn(width - 200, height - 70, 42, 'BASH', 0xc06040, v => touch.dash = v);
+      const bashX = jumpX - big - small - 8;
+      this.makeBtn(bashX, jumpY, small, 'BASH', 0xc06040, v => touch.dash = v);
     }
 
-    // Utility (top-right)
-    this.makeBtn(width - 50,  44, 28, 'M', 0x707080, null, () => this.openMap());
-    this.makeBtn(width - 110, 44, 28, '‖', 0x707080, null, () => this.openPause());
+    // Utility (top-right) — map + pause
+    const utilY = util + pad;
+    this.makeBtn(width - util - pad,                util + pad, util, 'M', 0x707080, null, () => this.openMap());
+    this.makeBtn(width - util * 3 - pad * 2 - 8,    util + pad, util, '‖', 0x707080, null, () => this.openPause());
   }
 
   // setFlag = function called with true on down / false on up — used for

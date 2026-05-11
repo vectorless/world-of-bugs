@@ -71,7 +71,7 @@ export class MapScene extends Phaser.Scene {
       fontFamily: 'monospace', fontSize: '22px', color: '#e8d890',
     }).setOrigin(0.5);
 
-    this.add.text(sw / 2, sh - 26, 'M or ESC to return', {
+    this.add.text(sw / 2, sh - 26, 'Tap or press M/ESC to return', {
       fontFamily: 'monospace', fontSize: '13px', color: '#9aa090',
     }).setOrigin(0.5);
 
@@ -84,11 +84,19 @@ export class MapScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const close = () => {
+      // Clear latched touch-button state so the dismissing tap doesn't
+      // leave a HUD button stuck "on" after the map closes.
+      const touch = this.registry.get('touchInput');
+      if (touch) {
+        touch.left = touch.right = false;
+        touch.jump = touch.dash = touch.sprint = false;
+      }
       this.scene.stop();
       this.scene.resume('GameScene');
     };
     this.input.keyboard.on('keydown-M', close);
     this.input.keyboard.on('keydown-ESC', close);
+    this.input.once('pointerdown', close);
   }
 }
 
