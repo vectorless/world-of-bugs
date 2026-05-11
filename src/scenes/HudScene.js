@@ -19,7 +19,13 @@ export class HudScene extends Phaser.Scene {
     // player picks up shell-bash.
     reg.events.on('changedata-abilities', () => this.layout());
 
-    this.scale.on('resize', () => this.layout());
+    // iOS Safari can fire `resize` rapidly (URL bar auto-hide, orientation
+    // transition keyframes). Debounce so layout only rebuilds once the
+    // viewport settles, preventing button flicker / mid-tap drops.
+    this.scale.on('resize', () => {
+      if (this._resizeTimer) clearTimeout(this._resizeTimer);
+      this._resizeTimer = setTimeout(() => this.layout(), 120);
+    });
     this.refresh();
   }
 
@@ -73,7 +79,9 @@ export class HudScene extends Phaser.Scene {
     const big   = Math.floor(r * 1.18);
     const small = Math.floor(r * 0.78);
     const util  = Math.max(20, Math.floor(r * 0.62));
-    const pad   = Math.max(12, Math.floor(r * 0.42));
+    // Generous bottom/edge padding keeps buttons clear of iPhone's home
+    // indicator gesture zone and any residual notch area on landscape.
+    const pad   = Math.max(22, Math.floor(r * 0.55));
 
     // Movement (bottom-left) — two side-by-side buttons
     const moveY  = height - r - pad;
