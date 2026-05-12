@@ -46,6 +46,7 @@ export class BeetleController {
     this.doubleJumpUsed = false;
     this.dashTimer = 0;         // ms left in current dash
     this.dashCooldown = 0;      // ms left until can dash again
+    this.dashDir = 'h';         // 'h' horizontal | 'd' down — locked when dash starts
     this.iframes = 0;           // ms left invulnerable
     this.wallJumpLockout = 0;   // ms during which horizontal input is overridden
     this.smashing = false;      // active ground-smash
@@ -100,10 +101,15 @@ export class BeetleController {
 
     // --- Horizontal movement ---
     if (this.isDashing()) {
-      // Dash holds horizontal velocity; player can't steer mid-dash
-      body.setVelocityX(this.facing * DASH_VELOCITY);
-      // Ignore gravity during dash for a clean horizontal line
-      body.setVelocityY(0);
+      if (this.dashDir === 'd') {
+        // Down-dash: straight vertical line, no horizontal steer.
+        body.setVelocityX(0);
+        body.setVelocityY(DASH_VELOCITY);
+      } else {
+        // Horizontal dash: locked direction, no gravity.
+        body.setVelocityX(this.facing * DASH_VELOCITY);
+        body.setVelocityY(0);
+      }
       body.setAllowGravity(false);
     } else if (this.smashing) {
       // Lock player into a vertical slam — no steering, fixed downward speed.
@@ -173,6 +179,9 @@ export class BeetleController {
         && !this.smashing) {
       this.dashTimer = DASH_DURATION_MS;
       this.dashCooldown = DASH_COOLDOWN_MS;
+      // Holding DOWN while bashing in the air turns the bash into a
+      // down-bash — a fast vertical sweep that breaks crumble floors.
+      this.dashDir = (input.down && !onGround) ? 'd' : 'h';
       this.iframes = Math.max(this.iframes, DASH_DURATION_MS);
       getSounds().dashSwoosh();
     }

@@ -485,6 +485,7 @@ export class GameScene extends Phaser.Scene {
     const input = {
       left:  this.keys.left.isDown  || this.keys.a.isDown || !!t.left,
       right: this.keys.right.isDown || this.keys.d.isDown || !!t.right,
+      down:  this.keys.down.isDown  || this.keys.s.isDown || !!t.smash,
       jumpPressed: jumpKeyDown || touchJumpJust,
       jumpHeld:    this.keys.jump.isDown || this.keys.w.isDown || !!t.jump,
       dashPressed: dashKeyDown || touchDashJust,
