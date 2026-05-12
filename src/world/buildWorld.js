@@ -289,13 +289,13 @@ export function buildWorld() {
   line(103, 53, 3, '#');
   line(113, 51, 4, '#');
 
-  // ---- Lower-route spike pits (each between two pillars) ----
+  // ---- Lower-route spike pits — only outside the boss-fight zone.
+  // The arena and its approaches (cols ~40-85) are kept fully spike-free
+  // so the dive-and-bash fight can't kill you on a stray hazard.
   fill(7, 57, 3, 1, '*');
   fill(14, 57, 4, 1, '*');
   fill(24, 57, 3, 1, '*');
   fill(33, 57, 5, 1, '*');
-  fill(45, 57, 4, 1, '*');
-  fill(81, 57, 4, 1, '*');
   fill(92, 57, 4, 1, '*');
   fill(103, 57, 4, 1, '*');
   fill(113, 57, 4, 1, '*');
