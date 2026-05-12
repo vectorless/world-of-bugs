@@ -13,6 +13,7 @@ export const TILES = {
   'X': { kind: 'solid',    texture: 'tile_crystal' },      // crystal pillar (Caverns)
   'x': { kind: 'solid',    texture: 'tile_crystal_floor' },// crystal-flecked floor
   'C': { kind: 'crumble',  texture: 'tile_crumble' },      // breaks with shellBash
+  'B': { kind: 'smash',    texture: 'tile_smash' },        // breaks with groundSmash
 };
 
 export function tileAt(grid, x, y) {
@@ -24,8 +25,8 @@ export function tileAt(grid, x, y) {
 
 export const ENTITY_GLYPHS = new Set([
   'P', 'D', 'F', 'S',
-  'a', 's', 'j', 'W',
-  'o', 'n', 'w', 'b',
+  'a', 's', 'j', 'W', 'Q',
+  'o', 'n', 'w', 'b', 'm',
 ]);
 
 export function isEntityGlyph(ch) {

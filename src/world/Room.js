@@ -18,6 +18,7 @@ export class Room {
 
     this.solids = scene.physics.add.staticGroup();
     this.crumbles = scene.physics.add.staticGroup();
+    this.smashBlocks = scene.physics.add.staticGroup();
     this.spikes = scene.physics.add.staticGroup();
     this.bouncy = scene.physics.add.staticGroup();
     this.tileImages = [];
@@ -62,11 +63,11 @@ export class Room {
           this.benches.push({ x: px, y: py });
         } else if (ch === 'S') {
           this.shopSpawn = { x: px, y: py };
-        } else if (ch === 'a' || ch === 's' || ch === 'j' || ch === 'W') {
-          const type = { a: 'ant', s: 'snail', j: 'springtail', W: 'waspQueen' }[ch];
+        } else if (ch === 'a' || ch === 's' || ch === 'j' || ch === 'W' || ch === 'Q') {
+          const type = { a: 'ant', s: 'snail', j: 'springtail', W: 'waspQueen', Q: 'burrowerQueen' }[ch];
           this.enemySpawns.push({ type, x: px, y: py, gx: x, gy: y });
-        } else if (ch === 'o' || ch === 'n' || ch === 'w' || ch === 'b') {
-          const type = { o: 'pollen', n: 'nectar', w: 'wings', b: 'bash' }[ch];
+        } else if (ch === 'o' || ch === 'n' || ch === 'w' || ch === 'b' || ch === 'm') {
+          const type = { o: 'pollen', n: 'nectar', w: 'wings', b: 'bash', m: 'smash' }[ch];
           const entityId = `${type}_${x}_${y}`;
           this.pickupSpawns.push({ type, x: px, y: py, gx: x, gy: y, entityId });
         }
@@ -80,6 +81,19 @@ export class Room {
       image.setDisplaySize(TILE_SIZE, TILE_SIZE);
       this.tileImages.push(image);
       const body = this.crumbles.create(px, py, tile.texture);
+      body.setDisplaySize(TILE_SIZE, TILE_SIZE).setVisible(false).refreshBody();
+      body.setData('grid', { x: gx, y: gy });
+      body.visibleImage = image;
+      return;
+    }
+
+    if (tile.kind === 'smash') {
+      // Skip if already smashed in a previous run (persisted in brokenWalls)
+      if (isWallBroken(this.scene.registry, gx, gy)) return;
+      const image = this.scene.add.image(px, py, tile.texture);
+      image.setDisplaySize(TILE_SIZE, TILE_SIZE);
+      this.tileImages.push(image);
+      const body = this.smashBlocks.create(px, py, tile.texture);
       body.setDisplaySize(TILE_SIZE, TILE_SIZE).setVisible(false).refreshBody();
       body.setData('grid', { x: gx, y: gy });
       body.visibleImage = image;
@@ -129,6 +143,19 @@ export class Room {
     return removed;
   }
 
+  destroySmashBlockAt(gx, gy) {
+    let removed = false;
+    this.smashBlocks.getChildren().slice().forEach(child => {
+      const g = child.getData('grid');
+      if (g && g.x === gx && g.y === gy) {
+        if (child.visibleImage) child.visibleImage.destroy();
+        child.destroy();
+        removed = true;
+      }
+    });
+    return removed;
+  }
+
   hasSolidAtTile(gx, gy) {
     return this.solidGrid.has(`${gx},${gy}`);
   }
@@ -137,6 +164,7 @@ export class Room {
     this.tileImages.forEach(img => img.destroy());
     this.solids.destroy(true);
     this.crumbles.destroy(true);
+    this.smashBlocks.destroy(true);
     this.spikes.destroy(true);
     this.bouncy.destroy(true);
   }

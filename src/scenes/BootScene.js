@@ -22,17 +22,22 @@ export class BootScene extends Phaser.Scene {
     makeRect(this, 'tile_bg_thorn', 32, 32, 0x281a14);
     makeRect(this, 'tile_bg_crystal',32, 32, 0x141a28);
 
+    makeRect(this, 'tile_smash',     32, 32, 0x5a4870);   // smash-block (purple-grey)
+    makeRect(this, 'tile_bg_burrows',32, 32, 0x100a14);
+
     makeRect(this, 'beetle',   22, 18, 0x3a2a4a);
     makeRect(this, 'ant',      18, 12, 0x882020);
     makeRect(this, 'snail',    24, 16, 0xa07840);
     makeRect(this, 'springtail',14,14, 0xe0d040);
     makeRect(this, 'wasp',     32, 22, 0xf0c020);
+    makeRect(this, 'burrower', 34, 28, 0x9050c0);          // second boss: violet
 
     makeRect(this, 'pickup_pollen',  10, 10, 0xffe060);
     makeRect(this, 'pickup_nectar',  14, 14, 0xff70a0);
     makeRect(this, 'pickup_wings',   18, 18, 0x80e0ff);
     makeRect(this, 'pickup_bash',    18, 18, 0xff8040);
     makeRect(this, 'pickup_walljump',18, 18, 0xa0e060);
+    makeRect(this, 'pickup_smash',   18, 18, 0xc060ff);
     makeRect(this, 'shop_stall',     28, 36, 0x6a5a30);
 
     this.scene.start('TitleScene');

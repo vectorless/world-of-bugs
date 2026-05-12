@@ -89,7 +89,7 @@ export class MapScene extends Phaser.Scene {
       const touch = this.registry.get('touchInput');
       if (touch) {
         touch.left = touch.right = false;
-        touch.jump = touch.dash = touch.sprint = false;
+        touch.jump = touch.dash = touch.smash = touch.sprint = false;
       }
       this.scene.stop();
       this.scene.resume('GameScene');
@@ -111,7 +111,10 @@ function tileColor(ch) {
     case 'X': return 0x7090c0;   // crystal pillar — pale blue
     case 'x': return 0x3a4a6a;   // crystal floor — slate
     case 'C': return 0x8a5a3a;
+    case 'B': return 0x5a4870;   // smash-block — purple-grey
     case 'S': return 0xc0a060;   // shop stall — gold
+    case 'Q': return 0xa040e0;   // burrower queen — violet
+    case 'm': return 0xc060ff;   // ground smash pickup — magenta
     case 'w': return 0x80e0ff;   // wings — bright cyan
     case 'b': return 0xff8040;   // bash — orange
     case 'o': return 0xffe060;   // pollen — yellow

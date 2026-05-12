@@ -19,7 +19,7 @@ export class PauseScene extends Phaser.Scene {
       const touch = this.registry.get('touchInput');
       if (touch) {
         touch.left = touch.right = false;
-        touch.jump = touch.dash = touch.sprint = false;
+        touch.jump = touch.dash = touch.smash = touch.sprint = false;
       }
       this.scene.stop();
       this.scene.resume('GameScene');

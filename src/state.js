@@ -19,7 +19,7 @@ export function initState(registry) {
   // change events on every pointer event.
   registry.set('touchInput', {
     left: false, right: false,
-    jump: false, dash: false, sprint: false,
+    jump: false, dash: false, smash: false, sprint: false,
   });
 }
 

@@ -5,4 +5,5 @@ export const PICKUPS = {
   nectar:  { texture: 'pickup_nectar',  effect: 'heal',       amount: 1 },
   wings:   { texture: 'pickup_wings',   effect: 'ability',    ability: 'doubleJump' },
   bash:    { texture: 'pickup_bash',    effect: 'ability',    ability: 'shellBash' },
+  smash:   { texture: 'pickup_smash',   effect: 'ability',    ability: 'groundSmash' },
 };

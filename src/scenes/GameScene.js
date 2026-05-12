@@ -28,6 +28,8 @@ export class GameScene extends Phaser.Scene {
       a:      'A',     d:     'D',
       jump:   'SPACE',
       w:      'W',     // alt jump
+      down:   'DOWN',  // ground smash (mid-air)
+      s:      'S',     // alt ground smash
       dash:   'X',
       map:    'M',
       pause:  'ESC',
@@ -38,7 +40,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-M', () => this.openMap());
 
     // Edge-detection state for touch buttons (so we can synthesize JustDown)
-    this.prevTouch = { jump: false, dash: false };
+    this.prevTouch = { jump: false, dash: false, smash: false };
 
     this.loadWorld();
   }
@@ -104,6 +106,12 @@ export class GameScene extends Phaser.Scene {
     );
     this.physics.add.collider(this.player, this.room.bouncy, this.onBouncyHit, null, this);
     this.physics.add.overlap(this.player, this.room.spikes, this.onSpikeOverlap, null, this);
+    this.physics.add.collider(
+      this.player, this.room.smashBlocks,
+      null,
+      (player, block) => this.onSmashBlockProcess(player, block),
+      this,
+    );
 
     for (const enemy of this.enemies) {
       this.physics.add.collider(enemy.sprite, this.room.solids);
@@ -265,6 +273,38 @@ export class GameScene extends Phaser.Scene {
     return true;
   }
 
+  onSmashBlockProcess(player, block) {
+    // Player tearing down through a smash-floor — destroy it, no collision.
+    if (this.beetle.isSmashing()) {
+      const g = block.getData('grid');
+      if (g) {
+        markWallBroken(this.registry, g.x, g.y);
+        this.room.destroySmashBlockAt(g.x, g.y);
+      }
+      return false;
+    }
+    return true;
+  }
+
+  onSmashLanding() {
+    // Sweep through any smash-blocks adjacent to where the player landed,
+    // so a corner landing still cracks the surrounding floor.
+    const tx = Math.floor(this.player.x / TILE_SIZE);
+    const ty = Math.floor((this.player.y + 16) / TILE_SIZE);
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = 0; dy <= 2; dy++) {
+        const x = tx + dx, y = ty + dy;
+        this.room.smashBlocks.getChildren().slice().forEach(child => {
+          const g = child.getData('grid');
+          if (g && g.x === x && g.y === y) {
+            markWallBroken(this.registry, g.x, g.y);
+            this.room.destroySmashBlockAt(g.x, g.y);
+          }
+        });
+      }
+    }
+  }
+
   onBouncyHit(player, mushroom) {
     if (player.body.touching.down || player.body.blocked.down) {
       player.body.setVelocityY(-(mushroom.bounceVelocity ?? 800));
@@ -298,8 +338,13 @@ export class GameScene extends Phaser.Scene {
         if (enemy.hp <= 0) {
           this.defeatEnemy(enemy);
           if (enemy.def.ai === 'boss') {
-            markCollected(this.registry, 'boss_defeated');
-            this.win();
+            if (enemy.type === 'waspQueen') {
+              markCollected(this.registry, 'queen_defeated');
+              this.openBurrowsPath();
+            } else if (enemy.type === 'burrowerQueen') {
+              markCollected(this.registry, 'burrower_defeated');
+              this.win();
+            }
           }
         }
         return;
@@ -381,6 +426,18 @@ export class GameScene extends Phaser.Scene {
     this.scene.pause();
   }
 
+  // Wasp Queen defeat: collapse the smash-block barrier in the Crystal
+  // Caverns floor (west side), opening the descent into the Burrows for
+  // the second boss.
+  openBurrowsPath() {
+    for (let x = 4; x <= 7; x++) {
+      if (this.room.destroySmashBlockAt(x, 78)) {
+        markWallBroken(this.registry, x, 78);
+      }
+    }
+    this.cameras.main.shake(420, 0.018);
+  }
+
   // Public methods called by the on-screen pause/map buttons in HudScene.
   // Idempotent — if a paused overlay is already active they do nothing.
   openPause() {
@@ -417,10 +474,13 @@ export class GameScene extends Phaser.Scene {
     const t = this.registry.get('touchInput') ?? {};
     const jumpKeyDown = Phaser.Input.Keyboard.JustDown(this.keys.jump) || Phaser.Input.Keyboard.JustDown(this.keys.w);
     const dashKeyDown = Phaser.Input.Keyboard.JustDown(this.keys.dash);
+    const smashKeyDown = Phaser.Input.Keyboard.JustDown(this.keys.down) || Phaser.Input.Keyboard.JustDown(this.keys.s);
     const touchJumpJust = t.jump && !this.prevTouch.jump;
     const touchDashJust = t.dash && !this.prevTouch.dash;
+    const touchSmashJust = t.smash && !this.prevTouch.smash;
     this.prevTouch.jump = !!t.jump;
     this.prevTouch.dash = !!t.dash;
+    this.prevTouch.smash = !!t.smash;
 
     const input = {
       left:  this.keys.left.isDown  || this.keys.a.isDown || !!t.left,
@@ -428,6 +488,7 @@ export class GameScene extends Phaser.Scene {
       jumpPressed: jumpKeyDown || touchJumpJust,
       jumpHeld:    this.keys.jump.isDown || this.keys.w.isDown || !!t.jump,
       dashPressed: dashKeyDown || touchDashJust,
+      smashPressed: smashKeyDown || touchSmashJust,
       sprint:      this.keys.sprint.isDown || !!t.sprint,
     };
     this.beetle.update(delta, input);

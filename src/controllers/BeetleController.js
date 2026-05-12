@@ -30,6 +30,9 @@ const WALL_JUMP_VX = 340;
 const WALL_JUMP_VY = -480;
 const WALL_SLIDE_MAX_FALL = 90;
 const WALL_JUMP_LOCKOUT_MS = 140;   // brief lockout so the wall-jump pushes away
+// Ground smash: a fast vertical slam that breaks smash-block floors.
+const SMASH_VY = 900;
+const SMASH_LANDING_FREEZE_MS = 140;
 
 export class BeetleController {
   constructor(scene, sprite) {
@@ -45,10 +48,13 @@ export class BeetleController {
     this.dashCooldown = 0;      // ms left until can dash again
     this.iframes = 0;           // ms left invulnerable
     this.wallJumpLockout = 0;   // ms during which horizontal input is overridden
+    this.smashing = false;      // active ground-smash
+    this.smashLandingFreeze = 0;// brief freeze after smash landing
     this.dead = false;
   }
 
   isDashing() { return this.dashTimer > 0; }
+  isSmashing() { return this.smashing; }
   isInvulnerable() { return this.iframes > 0; }
 
   update(delta, input) {
@@ -64,6 +70,27 @@ export class BeetleController {
     if (this.jumpBufferTimer > 0) this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - delta);
     if (this.wallJumpLockout > 0) this.wallJumpLockout = Math.max(0, this.wallJumpLockout - delta);
 
+    // Landing freeze after a ground smash — player can't move briefly.
+    if (this.smashLandingFreeze > 0) {
+      this.smashLandingFreeze = Math.max(0, this.smashLandingFreeze - delta);
+      body.setVelocity(0, 0);
+      body.setAllowGravity(true);
+      return;
+    }
+
+    // End a smash on touchdown — break-callback in GameScene fires for any
+    // smash-block we passed through; landing on solid ground stops the slam.
+    if (this.smashing && onGround) {
+      this.smashing = false;
+      this.smashLandingFreeze = SMASH_LANDING_FREEZE_MS;
+      body.setAllowGravity(true);
+      if (this.scene && typeof this.scene.onSmashLanding === 'function') {
+        this.scene.onSmashLanding();
+      }
+      this.scene.cameras.main.shake(220, 0.014);
+      return;
+    }
+
     if (onGround) {
       this.coyoteTimer = COYOTE_MS;
       this.doubleJumpUsed = false;
@@ -77,6 +104,11 @@ export class BeetleController {
       body.setVelocityX(this.facing * DASH_VELOCITY);
       // Ignore gravity during dash for a clean horizontal line
       body.setVelocityY(0);
+      body.setAllowGravity(false);
+    } else if (this.smashing) {
+      // Lock player into a vertical slam — no steering, fixed downward speed.
+      body.setVelocityX(0);
+      body.setVelocityY(SMASH_VY);
       body.setAllowGravity(false);
     } else if (this.wallJumpLockout > 0) {
       // Briefly hold the wall-jump's horizontal kick so the player actually
@@ -137,10 +169,24 @@ export class BeetleController {
     if (input.dashPressed
         && hasAbility(this.registry, 'shellBash')
         && this.dashTimer === 0
-        && this.dashCooldown === 0) {
+        && this.dashCooldown === 0
+        && !this.smashing) {
       this.dashTimer = DASH_DURATION_MS;
       this.dashCooldown = DASH_COOLDOWN_MS;
       this.iframes = Math.max(this.iframes, DASH_DURATION_MS);
+      getSounds().dashSwoosh();
+    }
+
+    // --- Ground smash (groundSmash) ---
+    if (input.smashPressed
+        && !onGround
+        && !this.smashing
+        && !this.isDashing()
+        && hasAbility(this.registry, 'groundSmash')) {
+      this.smashing = true;
+      body.setVelocity(0, SMASH_VY);
+      body.setAllowGravity(false);
+      this.iframes = Math.max(this.iframes, 200);  // brief i-frames on the slam
       getSounds().dashSwoosh();
     }
 

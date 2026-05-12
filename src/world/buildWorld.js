@@ -8,14 +8,15 @@
 // dead-end chambers hold bonus pickups.
 
 export const WORLD_WIDTH = 130;
-export const WORLD_HEIGHT = 80;
+export const WORLD_HEIGHT = 100;
 
 // Biome bands. Floor row of each biome is the last row in its band.
 export const BIOME_BANDS = [
   { from: 0,  to: 18, zone: 'lawn'    },
   { from: 19, to: 38, zone: 'hollow'  },
   { from: 39, to: 58, zone: 'thorn'   },
-  { from: 59, to: 79, zone: 'crystal' },
+  { from: 59, to: 78, zone: 'crystal' },
+  { from: 79, to: 99, zone: 'burrows' },
 ];
 
 export function buildWorld() {
@@ -408,6 +409,45 @@ export function buildWorld() {
   set(82, 77, 'o');
   set(102, 77, 'o');
   set(120, 77, 'o');
+
+  // ---- Smash-block barrier in the Caverns floor — opens after Wasp Queen
+  // is defeated, dropping into the Burrows. Locked closed otherwise.
+  fill(4, 78, 4, 1, 'B');
+
+  // =====================================================================
+  // BURROWS (rows 79-97 open, row 98 floor) — deep dirt warrens beneath
+  // the world. Smash-block floors gate the descent toward the Burrower
+  // Queen waiting in the central arena.
+  // =====================================================================
+  carve(1, 79, W - 2, 19);
+  line(1, 98, W - 2, '#');        // Burrows floor
+
+  // ---- Landing ledge: where the player drops in (from cols 4-7).
+  fill(2, 82, 8, 1, '#');         // wide landing ledge
+  set(6, 81, 'm');                // Ground Smash pickup right where they land
+  set(3, 81, 'F');                // bench on the landing — rest before descent
+
+  // ---- Smash-block floors layered at varied heights. Player must use
+  // ground smash to punch through each successive floor — they span the
+  // full width so there's no walking around them.
+  fill(2, 86, 126, 1, 'B');       // first smash floor
+  fill(2, 92, 126, 1, 'B');       // second smash floor (drops you into the arena)
+
+  // ---- Dirt walls dividing the middle layer
+  fill(30, 87, 2, 4, '#');
+  fill(80, 87, 2, 4, '#');
+
+  // ---- Burrower Queen — the second boss, floats in the arena
+  set(64, 95, 'Q');
+
+  // ---- Pickups along the descent (rewards for smashing through)
+  set(20, 85, 'o');
+  set(40, 85, 'o');
+  set(70, 85, 'o');
+  set(100, 85, 'n');              // nectar between smash floors
+  set(30, 91, 'o');
+  set(80, 91, 'o');
+  set(70, 97, 'n');               // last nectar in the arena
 
   // =====================================================================
   // Outer borders (re-affirm so nothing leaks)

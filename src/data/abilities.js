@@ -19,6 +19,12 @@ export const ABILITIES = {
     icon: 'pickup_walljump',
     blurb: 'Jump while against a wall to kick off it.',
   },
+  groundSmash: {
+    id: 'groundSmash',
+    name: 'Ground Smash',
+    icon: 'pickup_smash',
+    blurb: 'Press DOWN in mid-air to slam through weak floors.',
+  },
 };
 
-export const ABILITY_ORDER = ['doubleJump', 'shellBash', 'wallJump'];
+export const ABILITY_ORDER = ['doubleJump', 'shellBash', 'wallJump', 'groundSmash'];

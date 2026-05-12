@@ -46,4 +46,13 @@ export const ENEMIES = {
     contactDamage: 1,
     requiresBash: true,
   },
+  burrowerQueen: {
+    type: 'burrowerQueen',
+    ai: 'boss',
+    texture: 'burrower',
+    hp: 3,
+    speed: 0,
+    contactDamage: 1,
+    requiresBash: true,
+  },
 };
