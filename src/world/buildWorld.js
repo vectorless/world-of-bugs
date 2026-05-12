@@ -1,10 +1,11 @@
 // Procedurally constructs the single giant world map. The whole game runs in
-// this one Room. Three biomes are stacked vertically and connected by shafts,
-// with ability gates (wings + shell-bash) blocking the descent path.
+// this one Room. Three biomes are stacked vertically — Lawn (open air),
+// Hollow (tunnel system carved from solid dirt), Thorn (cavernous spike
+// corridors) — connected by shafts with ability gates between them.
 //
-// Each biome has at least one branching path — a "high route" with bonus
-// pickups and a "low route" with enemies — so the player can choose how to
-// approach each crossing.
+// Each biome is a network of tight corridors with branches: the player
+// repeatedly hits junctions and chooses which way to go. Side passages and
+// dead-end chambers hold bonus pickups.
 
 export const WORLD_WIDTH = 130;
 export const WORLD_HEIGHT = 60;
@@ -18,6 +19,7 @@ export const BIOME_BANDS = [
 
 export function buildWorld() {
   const W = WORLD_WIDTH, H = WORLD_HEIGHT;
+  // World starts as fully solid; everything below is carved out.
   const g = Array.from({ length: H }, () => Array(W).fill('#'));
 
   const set = (x, y, ch) => {
@@ -32,235 +34,285 @@ export function buildWorld() {
   const line = (x, y, n, ch) => { for (let i = 0; i < n; i++) set(x + i, y, ch); };
 
   // =====================================================================
-  // LAWN (rows 1-17 open, row 18 floor)
+  // LAWN (rows 1-17 open air, row 18 grass floor)
+  // The lawn is open above (sky), but the ground is cluttered: tall grass
+  // blades form vertical "gates" the player squeezes between, stepping
+  // platforms zig-zag east toward wings, and a treetop canopy of small
+  // platforms runs above (only reachable after wings).
   // =====================================================================
   carve(1, 1, W - 2, 17);
   line(1, 18, W - 2, 'g');
 
-  // ---- Low route: floor stepping platforms heading east to wings ----
-  // Each step rises 2 tiles — single-jump rise is ~3 tiles so this is
-  // comfortably clearable. Wings sit on the highest ledge.
-  line(10, 16, 4, 'g');
-  line(18, 14, 3, 'g');
-  line(26, 12, 3, 'g');
-  line(34, 10, 4, 'g');        // wings ledge (cols 34-37)
-  set(35, 9, 'w');             // wings pickup
-  line(43, 12, 3, 'g');
-  line(51, 14, 3, 'g');
-  line(60, 16, 3, 'g');
-  line(68, 14, 3, 'g');
-  line(76, 12, 3, 'g');
-  line(85, 14, 3, 'g');
-  line(95, 16, 3, 'g');
+  // ---- Grass-blade gates — tall 1-wide solid columns chunking the floor
+  // into mini-rooms the player passes through. Each blade is short enough
+  // to jump over from the floor. Placed in the floor gaps between stepping
+  // platforms so they don't block platform-to-platform jumps.
+  fill(5, 16, 1, 2, 'g');
+  fill(15, 16, 1, 2, 'g');
+  fill(22, 16, 1, 2, 'g');
+  fill(30, 15, 1, 3, 'g');
+  fill(46, 16, 1, 2, 'g');
+  fill(55, 15, 1, 3, 'g');
+  fill(64, 16, 1, 2, 'g');
+  fill(72, 15, 1, 3, 'g');
+  fill(82, 16, 1, 2, 'g');
+  fill(92, 15, 1, 3, 'g');
+  fill(100, 16, 1, 2, 'g');
+  fill(116, 16, 1, 2, 'g');
+  fill(120, 15, 1, 3, 'g');
 
-  // ---- High canopy branch — reached after wings, runs above main path ----
-  // A meandering "treetop" stripe of high platforms with bonus pickups.
-  // Requires double-jump to reach the first ledge from the wings platform.
+  // ---- Low route: stepping platforms east toward wings (2-tile steps)
+  line(10, 16, 3, 'g');
+  line(17, 14, 3, 'g');
+  line(25, 12, 3, 'g');
+  line(33, 10, 4, 'g');        // wings ledge (cols 33-36)
+  set(34, 9, 'w');             // wings pickup
+  line(41, 12, 3, 'g');
+  line(49, 14, 3, 'g');
+
+  // ---- High canopy branch — treetop ledges accessible after wings ----
+  // A meandering chain of small platforms rising west-to-east, holding
+  // bonus pollen and nectar. The drop from the canopy back to the floor
+  // is also a stealth shortcut past the wings gate (you fall in past it).
+  line(20, 7, 3, 'g');
+  line(30, 5, 3, 'g');
   line(40, 6, 3, 'g');
-  line(50, 4, 4, 'g');
-  line(60, 6, 3, 'g');
-  line(70, 4, 4, 'g');
-  line(80, 6, 3, 'g');
-  line(92, 4, 4, 'g');
-  line(102, 6, 3, 'g');
+  line(52, 4, 4, 'g');
+  line(63, 6, 3, 'g');
+  line(74, 4, 4, 'g');
+  line(85, 6, 3, 'g');
+  line(95, 4, 4, 'g');
+  line(105, 6, 3, 'g');
 
-  // Pollen + nectar in the canopy (encourage exploring up there)
-  set(41, 5, 'o');
-  set(51, 3, 'o');
-  set(61, 5, 'n');            // bonus nectar
-  set(71, 3, 'o');
-  set(81, 5, 'o');
-  set(93, 3, 'o');
-  set(103, 5, 'o');
+  // Pollen + nectar on the canopy (reward for taking the high route)
+  set(21, 6, 'o');
+  set(31, 4, 'o');
+  set(41, 5, 'n');             // canopy nectar
+  set(53, 3, 'o');
+  set(64, 5, 'o');
+  set(75, 3, 'n');             // second canopy nectar
+  set(86, 5, 'o');
+  set(96, 3, 'o');
+  set(106, 5, 'o');
 
   // ---- Wings-gate wall: 5-tile-tall block on east lawn ----
-  // Single-jump rise is ~3 tiles, double-jump ~5.4 tiles — a 5-tall wall
-  // sits in the sweet spot: uncrossable without wings, barely clearable
-  // with them.
+  // Approach from the floor requires double-jump to clear. Canopy walkers
+  // sail over it.
   fill(108, 14, 2, 5, '#');
 
-  // ---- Past the wall: open run-up and the Lawn→Hollow descent shaft ----
-  fill(122, 8, 4, 11, '.');   // shaft from row 8 down through floor row 18
+  // ---- East lawn run-up and descent shaft ----
+  fill(122, 8, 4, 11, '.');    // shaft from row 8 down through floor row 18
 
   // Lawn entities
-  set(3, 17, 'P');            // spawn
-  set(14, 17, 'a');           // ant on floor
+  set(3, 17, 'P');             // spawn
+  set(17, 17, 'a');            // ant on floor (between blades)
   set(45, 17, 'a');
-  set(80, 17, 'a');
-  set(116, 17, 'a');          // ant past the wall
+  set(78, 17, 'a');
+  set(115, 17, 'a');           // ant past the wall
 
-  // Lawn pollen along the low route (sit just above each stepping platform)
+  // Lawn pollen along the low route (above stepping platforms)
   set(11, 15, 'o');
-  set(19, 13, 'o');
-  set(27, 11, 'o');
-  set(36, 8, 'o');            // near wings
-  set(53, 13, 'o');
-  set(69, 13, 'o');
-  set(77, 11, 'o');
-  set(115, 17, 'o');
+  set(18, 13, 'o');
+  set(26, 11, 'o');
+  set(35, 8, 'o');             // near wings
+  set(42, 11, 'o');
+  set(50, 13, 'o');
+  set(118, 17, 'o');
 
   // =====================================================================
-  // HOLLOW (rows 19-37 open, row 38 floor)
+  // HOLLOW (rows 19-38) — TUNNEL SYSTEM
+  // Carved from solid dirt: a top tunnel, a middle tunnel, and a lower
+  // chamber, all connected by vertical shafts. The player picks routes
+  // through the maze: high path is fast, low path has enemies + loot.
   // =====================================================================
-  carve(1, 19, W - 2, 19);
+
+  // Top tunnel (rows 22-24, 3 tiles tall, runs almost the full width)
+  carve(4, 22, 121, 3);
+
+  // Middle tunnel (rows 27-29)
+  carve(4, 27, 121, 3);
+
+  // Lower chamber (rows 33-37, 5 tiles tall — more headroom for combat)
+  carve(4, 33, 121, 5);
+
+  // Hollow floor (row 38, solid dirt walkway)
   line(1, 38, W - 2, '#');
 
-  // Re-carve the Lawn→Hollow descent shaft so nothing blocks it
-  carve(122, 19, 4, 19);      // cols 122-125, rows 19-37
+  // ---- Vertical shafts connecting the corridors (junctions) ----
+  // Each shaft is 2 wide so the player has space to land/jump cleanly.
+  // Different shafts connect different tunnels — picking the right one
+  // matters.
+  fill(10, 22, 2, 16, '.');    // FULL shaft (top→middle→lower→floor)
+  fill(28, 22, 2, 7, '.');     // top→middle only
+  fill(40, 27, 2, 11, '.');    // middle→lower→floor
+  fill(58, 22, 2, 16, '.');    // FULL shaft
+  fill(70, 27, 2, 6, '.');     // middle→lower only
+  fill(82, 22, 2, 16, '.');    // FULL shaft
+  fill(96, 22, 2, 7, '.');     // top→middle
+  fill(108, 27, 2, 11, '.');   // middle→lower→floor
 
-  // ---- Pillars / overhangs giving the hollow a winding shape ----
-  // Hanging from the ceiling, with clearance above the floor so the
-  // low-route walker can pass beneath them.
-  fill(6, 20, 3, 8, '#');
-  fill(22, 24, 3, 6, '#');
-  fill(34, 20, 3, 7, '#');
-  fill(48, 22, 3, 8, '#');
-  fill(60, 25, 3, 6, '#');
-  fill(72, 22, 3, 9, '#');
-  fill(86, 25, 3, 7, '#');
-  fill(98, 22, 3, 9, '#');
-  fill(112, 25, 3, 7, '#');
+  // Lawn-to-hollow descent shaft (must clear everything in its path)
+  fill(122, 19, 4, 19, '.');
 
-  // Small floor bumps the player can hop over on the low route
-  fill(34, 36, 3, 2, '#');
-  fill(60, 35, 3, 3, '#');
+  // ---- Bash pickup chamber — a small alcove off the middle tunnel ----
+  // Accessible by walking west along the middle tunnel from any junction.
+  carve(14, 30, 5, 3, '.');    // sunken alcove below middle tunnel
+  line(14, 33, 5, '#');        // floor of the alcove
+  set(16, 32, 'b');            // bash pickup
+  set(15, 32, 'n');            // nectar by the bash
 
-  // ---- Upper tunnel route: ceiling platforms (rows 22-25) ----
-  // A higher path threading through the pillars — easier traversal but
-  // harder to reach (must use mushrooms or stack of pillars to climb up).
-  line(12, 24, 6, '#');
-  line(28, 23, 4, '#');
-  line(42, 22, 4, '#');
-  line(56, 23, 3, '#');
-  line(68, 22, 3, '#');
-  line(80, 23, 5, '#');
-  line(94, 22, 3, '#');
-  line(106, 24, 4, '#');
+  // ---- Secret chamber off the TOP tunnel (bonus loot) ----
+  // Reachable only via the upper route — a reward for taking the high path.
+  carve(48, 19, 8, 3, '.');    // ceiling pocket above the top tunnel
+  set(50, 20, 'n');
+  set(53, 20, 'o');
 
-  // Pollen along the upper route (reward for taking the harder path)
-  set(14, 23, 'o');
-  set(29, 22, 'o');
-  set(43, 21, 'o');
-  set(82, 22, 'o');
+  // ---- Hollow pillars / overhangs giving the tunnels character ----
+  // These are inside the carved tunnels, narrowing them into bottlenecks
+  // the player threads through.
+  set(20, 23, '#'); set(20, 24, '#');   // mini pillar in top tunnel
+  set(36, 28, '#'); set(36, 29, '#');   // mini pillar in middle tunnel
+  set(46, 23, '#');                     // overhang in top tunnel
+  set(64, 28, '#');
+  set(76, 23, '#'); set(76, 24, '#');
+  set(88, 28, '#');
+  set(102, 23, '#');
+  set(116, 28, '#');
 
-  // ---- Bash pickup chamber — small ledge mid-west ----
-  line(13, 32, 4, '#');
-  set(15, 31, 'b');
-  set(14, 31, 'n');           // bonus nectar by the bash pickup
+  // ---- Bouncy mushrooms in the lower chamber (boost up to upper tunnels)
+  set(6, 37, '~');
+  set(24, 37, '~');
+  set(44, 37, '~');
+  set(62, 37, '~');
+  set(78, 37, '~');
+  set(94, 37, '~');
+  set(112, 37, '~');
+  set(123, 37, '~');           // under descent shaft for return travel
 
-  // ---- Secret alcove: tucked behind the central pillar ----
-  // A small chamber with bonus nectar, off the obvious path.
-  carve(38, 27, 8, 3, '.');
-  line(38, 30, 8, '#');
-  set(40, 29, 'n');
-  set(43, 29, 'o');
+  // ---- Enemies along the lower chamber (low route is dangerous) ----
+  set(15, 37, 's');            // snail
+  set(32, 37, 'j');            // springtail
+  set(48, 37, 's');
+  set(66, 37, 'j');
+  set(85, 37, 's');
+  set(100, 37, 'j');
+  set(115, 37, 'j');
 
-  // ---- Bouncy mushrooms along the hollow floor (let you reach upper route) ----
-  set(4, 37, '~');
-  set(20, 37, '~');
-  set(38, 37, '~');
-  set(54, 37, '~');
-  set(68, 37, '~');
-  set(82, 37, '~');
-  set(96, 37, '~');
-  set(110, 37, '~');
-  set(123, 37, '~');           // under descent shaft, for return travel
+  // Sprinkle of pollen along each tunnel
+  set(8, 23, 'o');             // top tunnel
+  set(34, 23, 'o');
+  set(68, 23, 'o');
+  set(98, 23, 'o');
 
-  // ---- Lower-route enemies (more dangerous if you stay on the floor) ----
-  set(12, 37, 's');           // snail
-  set(28, 37, 's');           // snail
-  set(46, 37, 'j');           // springtail
-  set(64, 37, 'j');
-  set(78, 37, 's');
-  set(92, 37, 'j');
-  set(106, 37, 'j');
+  set(12, 28, 'o');            // middle tunnel
+  set(32, 28, 'o');
+  set(60, 28, 'o');
+  set(92, 28, 'o');
+  set(112, 28, 'o');
 
-  // Hollow pollen + nectar (mostly on the low route)
-  set(10, 30, 'o');
-  set(26, 30, 'o');
-  set(56, 30, 'o');
-  set(70, 30, 'o');
-  set(88, 30, 'o');
-  set(102, 30, 'o');
-  set(115, 30, 'o');
-  set(50, 37, 'n');           // nectar on the floor
+  set(20, 37, 'o');            // lower chamber floor
+  set(50, 37, 'o');
+  set(75, 37, 'o');
+  set(105, 37, 'n');           // nectar mid-floor
 
   // =====================================================================
   // HOLLOW→THORN CRUMBLE GATE
+  // Just east of the descent shaft — player must traverse west to find
+  // bash, then return east and bash through this gate to fall into thorn.
   // =====================================================================
-  // The descent shaft drops the player on the hollow floor at cols 122-125;
-  // the crumble gate sits just east of the shaft. Walking east is blocked
-  // until the player finds Shell Bash (west side) and returns. Wall is
-  // taller than any double-jump can clear, so the only way past is bash.
-  // After bashing through, the player falls through the hole in the
-  // hollow floor below into the thorn biome.
-  fill(126, 31, 3, 7, 'C');   // crumble wall (cols 126-128, rows 31-37)
-  fill(126, 38, 3, 1, '.');   // hole in the hollow floor
+  fill(126, 31, 3, 7, 'C');
+  fill(126, 38, 3, 1, '.');
 
   // =====================================================================
-  // THORN (rows 39-57 open, row 58 floor)
+  // THORN (rows 39-57 open, row 58 floor) — PACKED CORRIDORS
+  // Thorn pillars from below + dirt overhangs from above form tight zig-
+  // zag corridors. Two parallel paths (high ledges and low spike floor)
+  // both lead west to the boss arena in the center.
   // =====================================================================
   carve(1, 39, W - 2, 19);
   line(1, 58, W - 2, '#');
 
-  // ---- East entry corridor (where you drop in from the crumble shaft) ----
-  // Checkpoint right where the player lands.
+  // ---- Ceiling overhangs (hanging from the top of the thorn band) ----
+  // Force the player to drop down occasionally, creating natural choke
+  // points and forcing path commitment. Note: the descent shaft drop at
+  // cols 126-128 must stay clear, so no overhang above col 122.
+  fill(4, 39, 4, 4, '#');
+  fill(15, 39, 4, 5, '#');
+  fill(34, 39, 4, 6, '#');
+  fill(48, 39, 4, 4, '#');
+  fill(78, 39, 4, 4, '#');
+  fill(92, 39, 4, 6, '#');
+  fill(112, 39, 4, 5, '#');
+
+  // ---- Thorn pillars from the floor — solid walls in tight packing ----
+  fill(10, 42, 3, 14, 'T');
+  fill(20, 46, 3, 10, 'T');
+  fill(28, 42, 3, 14, 'T');
+  fill(40, 45, 3, 11, 'T');
+  fill(54, 47, 3, 8, 'T');     // smaller pillar (boss arena west wall)
+  fill(75, 47, 3, 8, 'T');     // boss arena east wall
+  fill(85, 45, 3, 11, 'T');
+  fill(97, 42, 3, 14, 'T');
+  fill(108, 46, 3, 10, 'T');
+  fill(118, 42, 3, 13, 'T');
+
+  // ---- Upper-route ledges (small platforms above each spike pit).
+  // Two-tier hopping: floor ↔ ledge ↔ floor pattern weaves through the
+  // pillars without touching spikes.
+  line(7, 53, 3, '#');
+  line(14, 51, 4, '#');
+  line(24, 53, 3, '#');
+  line(33, 51, 3, '#');
+  line(45, 53, 3, '#');
+  line(81, 53, 3, '#');
+  line(92, 51, 4, '#');
+  line(103, 53, 3, '#');
+  line(113, 51, 4, '#');
+
+  // ---- Lower-route spike pits (each between two pillars) ----
+  fill(7, 57, 3, 1, '*');
+  fill(14, 57, 4, 1, '*');
+  fill(24, 57, 3, 1, '*');
+  fill(33, 57, 5, 1, '*');
+  fill(45, 57, 4, 1, '*');
+  fill(81, 57, 4, 1, '*');
+  fill(92, 57, 4, 1, '*');
+  fill(103, 57, 4, 1, '*');
+  fill(113, 57, 4, 1, '*');
+
+  // Boss arena (cols ~57-74) is clear of spikes for the fight.
+
+  // ---- Checkpoint right where the player drops in (east entry) ----
   set(127, 57, 'F');
 
-  // ---- Thorn pillars — big and intimidating ----
-  // Left side
-  fill(8, 42, 3, 14, 'T');
-  fill(18, 45, 3, 11, 'T');
-  fill(28, 42, 3, 14, 'T');
-  // Center (around the boss arena)
-  fill(38, 43, 3, 10, 'T');
-  fill(52, 45, 3, 9, 'T');
-  fill(74, 45, 3, 9, 'T');
-  fill(88, 43, 3, 13, 'T');
-  // Right side (closer to entry)
-  fill(98, 42, 3, 14, 'T');
-  fill(108, 45, 3, 11, 'T');
+  // ---- Side chamber off the east entry (small reward for exploring)
+  // A pocket up and to the east, accessible by jumping from the floor.
+  carve(118, 50, 4, 3, '.');
+  line(118, 53, 4, '#');
+  set(120, 52, 'n');           // nectar in the side chamber
 
-  // ---- Upper-route ledges (small platforms hovering above each spike pit).
-  // Players can either jump the spikes from the floor or hop ledge-to-ledge
-  // above them — same destination, different rhythm.
-  line(12, 54, 3, '#');
-  line(22, 54, 4, '#');
-  line(32, 54, 3, '#');
-  line(42, 54, 4, '#');
-  line(80, 54, 3, '#');
-  line(94, 54, 4, '#');
-  line(104, 54, 3, '#');
-
-  // ---- Lower-route spike pits (shorter but riskier) ----
-  // The boss arena (~cols 55-73) is left clear so the player has solid
-  // footing for the dive-and-bash dance.
-  fill(12, 57, 3, 1, '*');
-  fill(22, 57, 4, 1, '*');
-  fill(32, 57, 3, 1, '*');
-  fill(42, 57, 4, 1, '*');
-  fill(80, 57, 3, 1, '*');
-  fill(94, 57, 4, 1, '*');
-  fill(104, 57, 3, 1, '*');
-
-  // ---- Springtails patrolling the lower-route floor ----
+  // ---- Enemies: springtails patrolling the lower floor ----
   set(20, 56, 'j');
   set(46, 56, 'j');
   set(72, 56, 'j');
-  set(96, 56, 'j');
+  set(100, 56, 'j');
 
-  // ---- Pickups: pollen rewards on the upper ledges, nectar near the boss
-  set(13, 53, 'o');
-  set(23, 53, 'o');
-  set(43, 53, 'o');
-  set(81, 53, 'o');
-  set(95, 53, 'o');
+  // ---- Pickups: pollen on the upper ledges, nectar near the boss ----
+  set(8, 52, 'o');
+  set(15, 50, 'o');
+  set(25, 52, 'o');
+  set(34, 50, 'o');
+  set(46, 52, 'o');
+  set(82, 52, 'o');
+  set(94, 50, 'o');
+  set(104, 52, 'o');
+  set(114, 50, 'o');
   set(50, 57, 'o');
   set(78, 57, 'o');
-  set(62, 57, 'n');           // last nectar before the boss
+  set(65, 57, 'n');            // last nectar before the boss
 
-  // ---- Wasp Queen — center of thorn arena ----
-  set(62, 50, 'W');
+  // ---- Wasp Queen — center of the thorn arena ----
+  set(65, 50, 'W');
 
   // =====================================================================
   // Outer borders (re-affirm so nothing leaks)
