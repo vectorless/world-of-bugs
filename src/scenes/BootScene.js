@@ -14,9 +14,13 @@ export class BootScene extends Phaser.Scene {
     makeRect(this, 'tile_thorn',    32, 32, 0x2a3a1a);
     makeRect(this, 'tile_spike',    32, 16, 0xcc4444);
     makeRect(this, 'tile_crumble',  32, 32, 0x8a5a3a);
+    makeRect(this, 'tile_crystal',  32, 32, 0x7090c0);   // Crystal Caverns pillar
+    makeRect(this, 'tile_crystal_floor', 32, 32, 0x3a4a6a);
+    makeRect(this, 'tile_bench',    36, 18, 0x9080a0);   // bench/rest spot
     makeRect(this, 'tile_bg_lawn',  32, 32, 0x1f3a14);
     makeRect(this, 'tile_bg_hollow',32, 32, 0x1a1424);
     makeRect(this, 'tile_bg_thorn', 32, 32, 0x281a14);
+    makeRect(this, 'tile_bg_crystal',32, 32, 0x141a28);
 
     makeRect(this, 'beetle',   22, 18, 0x3a2a4a);
     makeRect(this, 'ant',      18, 12, 0x882020);

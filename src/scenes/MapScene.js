@@ -108,12 +108,15 @@ function tileColor(ch) {
     case '~': return 0xc26a8a;
     case '*': return 0xcc4444;
     case 'T': return 0x2a3a1a;
+    case 'X': return 0x7090c0;   // crystal pillar — pale blue
+    case 'x': return 0x3a4a6a;   // crystal floor — slate
     case 'C': return 0x8a5a3a;
+    case 'S': return 0xc0a060;   // shop stall — gold
     case 'w': return 0x80e0ff;   // wings — bright cyan
     case 'b': return 0xff8040;   // bash — orange
     case 'o': return 0xffe060;   // pollen — yellow
     case 'n': return 0xff70a0;   // nectar — pink
-    case 'F': return 0xffe060;   // checkpoint — yellow
+    case 'F': return 0xffe060;   // bench — yellow
     case 'W': return 0xff4040;   // boss — red
     case '.': return 0x1a1a1a;   // explored empty
     default:  return 0x1a1a1a;

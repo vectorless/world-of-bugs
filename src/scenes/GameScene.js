@@ -8,7 +8,7 @@ import { TILE_SIZE } from '../world/tiles.js';
 import { BeetleController } from '../controllers/BeetleController.js';
 import { CameraController } from '../controllers/CameraController.js';
 import {
-  takeDamage, heal, collectPollen, unlockAbility,
+  takeDamage, heal, refillHealth, collectPollen, unlockAbility,
   markCollected, isCollected, markWallBroken,
   setCheckpoint, getCheckpoint, respawn, markExplored,
 } from '../state.js';
@@ -69,10 +69,13 @@ export class GameScene extends Phaser.Scene {
       this.pickups.push(this.spawnPickup(spec));
     }
 
-    // Checkpoint marker fx (only if there's an F glyph nearby)
-    if (this.room.checkpoint) {
-      const fx = this.add.rectangle(this.room.checkpoint.x, this.room.checkpoint.y, 20, 28, 0xffe060, 0.5);
-      this.tweens.add({ targets: fx, alpha: 0.15, yoyo: true, repeat: -1, duration: 700 });
+    // Bench markers (HK-style rest spots) — one FX per bench.
+    this.benchTouchedKey = null;
+    for (const cp of this.room.benches) {
+      const seat = this.add.image(cp.x, cp.y + 6, 'tile_bench');
+      seat.setDepth(-1);
+      const glow = this.add.rectangle(cp.x, cp.y - 2, 22, 30, 0xffe060, 0.35);
+      this.tweens.add({ targets: glow, alpha: 0.12, yoyo: true, repeat: -1, duration: 700 });
     }
 
     // Shop stall (one per world). Pure visual + distance trigger — we don't
@@ -447,12 +450,21 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // Pick up checkpoint marker if standing on it
-    if (this.room.checkpoint
-        && Math.abs(this.player.x - this.room.checkpoint.x) < 24
-        && Math.abs(this.player.y - this.room.checkpoint.y) < 24) {
-      setCheckpoint(this.registry, this.room.checkpoint.x, this.room.checkpoint.y);
+    // Bench check — find the nearest bench within range. On first contact
+    // with a bench, refill HP and set it as the active checkpoint. Heals
+    // only once per visit so the player can't sit on it for infinite HP.
+    let nowOnBench = null;
+    for (const cp of this.room.benches) {
+      if (Math.abs(this.player.x - cp.x) < 24 && Math.abs(this.player.y - cp.y) < 24) {
+        nowOnBench = `${cp.x},${cp.y}`;
+        setCheckpoint(this.registry, cp.x, cp.y);
+        break;
+      }
     }
+    if (nowOnBench && nowOnBench !== this.benchTouchedKey) {
+      refillHealth(this.registry);
+    }
+    this.benchTouchedKey = nowOnBench;
 
     // Shop trigger — overlap opens the shop scene. Cooldown after close
     // prevents the player from immediately re-opening it.

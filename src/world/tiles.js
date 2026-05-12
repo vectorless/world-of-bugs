@@ -10,6 +10,8 @@ export const TILES = {
   '~': { kind: 'bouncy',   texture: 'tile_mushroom', bounce: 900 },
   '*': { kind: 'spike',    texture: 'tile_spike' },        // solid + hurts on touch
   'T': { kind: 'solid',    texture: 'tile_thorn' },        // tall thorny pillar (solid wall)
+  'X': { kind: 'solid',    texture: 'tile_crystal' },      // crystal pillar (Caverns)
+  'x': { kind: 'solid',    texture: 'tile_crystal_floor' },// crystal-flecked floor
   'C': { kind: 'crumble',  texture: 'tile_crumble' },      // breaks with shellBash
 };
 

@@ -43,18 +43,21 @@ export class ShopScene extends Phaser.Scene {
     frame.lineStyle(2, 0xe8d890, 1);
     frame.strokeRect(panelX, panelY, panelW, panelH);
 
-    this.add.text(panelX + panelW / 2, panelY + 24, 'SHOP — Beetle\'s Bazaar', {
-      fontFamily: 'monospace', fontSize: '20px', color: '#ffe060',
+    this.add.text(panelX + panelW / 2, panelY + 22, 'SLY THE FORAGER', {
+      fontFamily: 'monospace', fontSize: '18px', color: '#ffe060',
+    }).setOrigin(0.5);
+    this.add.text(panelX + panelW / 2, panelY + 44, '"Welcome, hatchling — care for a relic?"', {
+      fontFamily: 'monospace', fontSize: '11px', color: '#a09080', fontStyle: 'italic',
     }).setOrigin(0.5);
 
-    this.pollenLabel = this.add.text(panelX + panelW / 2, panelY + 50, '', {
-      fontFamily: 'monospace', fontSize: '14px', color: '#cccccc',
+    this.pollenLabel = this.add.text(panelX + panelW / 2, panelY + 62, '', {
+      fontFamily: 'monospace', fontSize: '13px', color: '#cccccc',
     }).setOrigin(0.5);
 
     this.refreshPollenLabel();
 
     // Items
-    let y = panelY + 84;
+    let y = panelY + 96;
     this.itemRows = [];
     for (const item of ITEMS) {
       const row = this.makeItemRow(panelX + 20, y, panelW - 40, item);
@@ -128,13 +131,19 @@ export class ShopScene extends Phaser.Scene {
     const panelW = Math.min(440, this.scale.width - 40);
     const panelX = (this.scale.width - panelW) / 2;
     const panelY = (this.scale.height - Math.min(360, this.scale.height - 60)) / 2;
-    let y = panelY + 84;
+    let y = panelY + 96;
     this.itemRows = [];
     for (const item of ITEMS) {
       const row = this.makeItemRow(panelX + 20, y, panelW - 40, item);
       this.itemRows.push(row);
       y += 90;
     }
+  }
+
+  // Used by rebuildRows() — kept in sync with the y offset above.
+  get itemRowStartY() {
+    const panelH = Math.min(360, this.scale.height - 60);
+    return (this.scale.height - panelH) / 2 + 96;
   }
 
   closeShop() {

@@ -28,7 +28,7 @@ export class Room {
     this.playerSpawn = null;
     this.enemySpawns = [];   // { type, x, y, gx, gy }
     this.pickupSpawns = [];  // { type, x, y, gx, gy, entityId }
-    this.checkpoint = null;  // { x, y }
+    this.benches = [];       // array of { x, y } — each F glyph adds one
     this.shopSpawn = null;   // { x, y } — placed once per world
 
     this.parseGrid();
@@ -59,7 +59,7 @@ export class Room {
         if (ch === 'P') {
           this.playerSpawn = { x: px, y: py };
         } else if (ch === 'F') {
-          this.checkpoint = { x: px, y: py };
+          this.benches.push({ x: px, y: py });
         } else if (ch === 'S') {
           this.shopSpawn = { x: px, y: py };
         } else if (ch === 'a' || ch === 's' || ch === 'j' || ch === 'W') {

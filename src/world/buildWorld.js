@@ -8,13 +8,14 @@
 // dead-end chambers hold bonus pickups.
 
 export const WORLD_WIDTH = 130;
-export const WORLD_HEIGHT = 60;
+export const WORLD_HEIGHT = 80;
 
 // Biome bands. Floor row of each biome is the last row in its band.
 export const BIOME_BANDS = [
-  { from: 0,  to: 18, zone: 'lawn'   },
-  { from: 19, to: 38, zone: 'hollow' },
-  { from: 39, to: 59, zone: 'thorn'  },
+  { from: 0,  to: 18, zone: 'lawn'    },
+  { from: 19, to: 38, zone: 'hollow'  },
+  { from: 39, to: 58, zone: 'thorn'   },
+  { from: 59, to: 79, zone: 'crystal' },
 ];
 
 export function buildWorld() {
@@ -283,8 +284,15 @@ export function buildWorld() {
 
   // Boss arena (cols ~57-74) is clear of spikes for the fight.
 
-  // ---- Checkpoint right where the player drops in (east entry) ----
+  // ---- Bench right where the player drops in (east entry) ----
+  // (Sit on the bench to refill HP and set a checkpoint, Hollow Knight-style.)
   set(127, 57, 'F');
+
+  // ---- West descent shaft: drops from Thorn floor down into Crystal Caverns.
+  // Punch a hole in the Thorn floor at cols 4-5 and the player can fall
+  // through into the new biome below. There's no ability gate — the Caverns
+  // are open exploration content once you've reached the Thorn at all.
+  fill(4, 58, 2, 1, '.');
 
   // ---- Side chamber off the east entry (small reward for exploring)
   // A pocket up and to the east, accessible by jumping from the floor.
@@ -314,6 +322,89 @@ export function buildWorld() {
 
   // ---- Wasp Queen — center of the thorn arena ----
   set(65, 50, 'W');
+
+  // =====================================================================
+  // CRYSTAL CAVERNS (rows 59-77 open, row 78 floor)
+  // A new biome — a "tiny bit like Hollow Knight's Crystal Peaks". Bright
+  // crystal-flecked stone, jagged crystal pillars, and a bench to rest at.
+  // Optional exploration — has no ability gate or boss, just bonus loot.
+  // =====================================================================
+  carve(1, 59, W - 2, 19);
+  line(1, 78, W - 2, 'x');     // crystal-flecked floor
+
+  // ---- Re-affirm the west entry shaft so nothing back-fills it
+  carve(4, 59, 2, 19);
+
+  // ---- Stubby crystal pillars from the floor — short jump-overs ----
+  // Kept low (3-5 tall) so the floor is traversable end-to-end without
+  // needing pillar climbing tricks.
+  fill(14, 74, 2, 4, 'X');
+  fill(24, 75, 2, 3, 'X');
+  fill(36, 73, 2, 5, 'X');
+  fill(48, 75, 2, 3, 'X');
+  fill(64, 74, 2, 4, 'X');
+  fill(78, 75, 2, 3, 'X');
+  fill(92, 73, 2, 5, 'X');
+  fill(108, 74, 2, 4, 'X');
+  fill(118, 75, 2, 3, 'X');
+
+  // ---- Ceiling stalactites (overhangs of crystal hanging from above)
+  fill(8, 59, 3, 4, 'X');
+  fill(20, 59, 3, 3, 'X');
+  fill(32, 59, 3, 5, 'X');
+  fill(46, 59, 3, 4, 'X');
+  fill(58, 59, 3, 3, 'X');
+  fill(70, 59, 3, 5, 'X');
+  fill(82, 59, 3, 4, 'X');
+  fill(96, 59, 3, 3, 'X');
+  fill(110, 59, 3, 5, 'X');
+  fill(122, 59, 3, 4, 'X');
+
+  // ---- Mid-air crystal ledges (small platforms for the high route) ----
+  line(7, 74, 4, 'x');
+  line(18, 71, 4, 'x');
+  line(30, 73, 4, 'x');
+  line(44, 70, 4, 'x');
+  line(58, 73, 4, 'x');
+  line(72, 70, 4, 'x');
+  line(86, 73, 4, 'x');
+  line(100, 70, 4, 'x');
+  line(112, 73, 4, 'x');
+
+  // ---- Bouncy crystal blooms (act like mushrooms; bright pink in v0.1)
+  set(20, 77, '~');
+  set(42, 77, '~');
+  set(70, 77, '~');
+  set(98, 77, '~');
+
+  // ---- Bench (rest spot) on a small platform mid-cavern
+  fill(60, 75, 4, 1, 'x');     // bench platform
+  set(62, 74, 'F');             // bench/checkpoint
+
+  // ---- Enemies — sluggish armored crawlers + leapers
+  set(16, 77, 's');             // crystal crawler
+  set(46, 77, 's');
+  set(82, 77, 's');
+  set(110, 77, 's');
+  set(30, 70, 'j');             // glittermites on the ledges
+  set(75, 70, 'j');
+
+  // ---- Pickups — pollen on each ledge plus nectar caches; bonus floor pollen
+  set(8, 73, 'o');              // above ledge row 74
+  set(19, 70, 'o');             // above ledge row 71
+  set(32, 72, 'o');             // above ledge row 73
+  set(45, 69, 'n');             // above ledge row 70 — nectar
+  set(60, 72, 'o');             // above ledge row 73
+  set(73, 69, 'o');             // above ledge row 70
+  set(87, 72, 'o');             // above ledge row 73
+  set(101, 69, 'n');            // second nectar
+  set(113, 72, 'o');            // above ledge row 73
+  set(8, 77, 'o');              // floor scatter
+  set(28, 77, 'o');
+  set(54, 77, 'o');
+  set(82, 77, 'o');
+  set(102, 77, 'o');
+  set(120, 77, 'o');
 
   // =====================================================================
   // Outer borders (re-affirm so nothing leaks)
