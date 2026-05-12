@@ -29,6 +29,7 @@ export class Room {
     this.enemySpawns = [];   // { type, x, y, gx, gy }
     this.pickupSpawns = [];  // { type, x, y, gx, gy, entityId }
     this.checkpoint = null;  // { x, y }
+    this.shopSpawn = null;   // { x, y } — placed once per world
 
     this.parseGrid();
   }
@@ -59,6 +60,8 @@ export class Room {
           this.playerSpawn = { x: px, y: py };
         } else if (ch === 'F') {
           this.checkpoint = { x: px, y: py };
+        } else if (ch === 'S') {
+          this.shopSpawn = { x: px, y: py };
         } else if (ch === 'a' || ch === 's' || ch === 'j' || ch === 'W') {
           const type = { a: 'ant', s: 'snail', j: 'springtail', W: 'waspQueen' }[ch];
           this.enemySpawns.push({ type, x: px, y: py, gx: x, gy: y });

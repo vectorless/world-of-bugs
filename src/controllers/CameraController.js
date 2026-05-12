@@ -9,7 +9,7 @@ export class CameraController {
     this.camera = scene.cameras.main;
     this.camera.startFollow(target, true, 0.10, 0.10);
     this.camera.setDeadzone(120, 60);
-    this.camera.setZoom(1);
+    this.camera.setZoom(3);
   }
 
   setBounds(pixelWidth, pixelHeight) {

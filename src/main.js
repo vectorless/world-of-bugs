@@ -6,6 +6,7 @@ import { HudScene } from './scenes/HudScene.js';
 import { PauseScene } from './scenes/PauseScene.js';
 import { WinScene } from './scenes/WinScene.js';
 import { MapScene } from './scenes/MapScene.js';
+import { ShopScene } from './scenes/ShopScene.js';
 import { initState } from './state.js';
 
 const game = new Phaser.Game({
@@ -28,7 +29,7 @@ const game = new Phaser.Game({
   input: {
     activePointers: 4,   // multi-touch: hold direction + jump simultaneously
   },
-  scene: [BootScene, TitleScene, GameScene, HudScene, PauseScene, WinScene, MapScene]
+  scene: [BootScene, TitleScene, GameScene, HudScene, PauseScene, WinScene, MapScene, ShopScene]
 });
 
 initState(game.registry);

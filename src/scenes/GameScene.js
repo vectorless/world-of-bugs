@@ -75,6 +75,21 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: fx, alpha: 0.15, yoyo: true, repeat: -1, duration: 700 });
     }
 
+    // Shop stall (one per world). Pure visual + distance trigger — we don't
+    // need physics for this since the overlap is checked per frame.
+    this.shopCooldown = 0;
+    this.shop = null;
+    if (this.room.shopSpawn) {
+      const sx = this.room.shopSpawn.x;
+      const sy = this.room.shopSpawn.y - 2;
+      const stall = this.add.image(sx, sy, 'shop_stall');
+      const sign = this.add.text(sx, sy - 28, 'SHOP', {
+        fontFamily: 'monospace', fontSize: '10px', color: '#ffe060',
+      }).setOrigin(0.5);
+      this.tweens.add({ targets: sign, y: sy - 32, yoyo: true, repeat: -1, duration: 900, ease: 'Sine.easeInOut' });
+      this.shop = { sprite: stall, sign, x: sx, y: sy };
+    }
+
     // Colliders
     this.physics.world.setBounds(0, 0, this.room.pixelWidth, this.room.pixelHeight);
     this.physics.add.collider(this.player, this.room.solids);
@@ -371,6 +386,13 @@ export class GameScene extends Phaser.Scene {
     this.scene.launch('PauseScene');
   }
 
+  openShop() {
+    if (!this.scene.isActive('GameScene')) return;
+    this.shopCooldown = 9999;   // freeze re-open until ShopScene resets it
+    this.scene.pause();
+    this.scene.launch('ShopScene');
+  }
+
   openMap() {
     if (!this.scene.isActive('GameScene')) return;
     if (!this.player) return;
@@ -430,6 +452,17 @@ export class GameScene extends Phaser.Scene {
         && Math.abs(this.player.x - this.room.checkpoint.x) < 24
         && Math.abs(this.player.y - this.room.checkpoint.y) < 24) {
       setCheckpoint(this.registry, this.room.checkpoint.x, this.room.checkpoint.y);
+    }
+
+    // Shop trigger — overlap opens the shop scene. Cooldown after close
+    // prevents the player from immediately re-opening it.
+    if (this.shopCooldown > 0) this.shopCooldown = Math.max(0, this.shopCooldown - delta);
+    if (this.shop && this.shopCooldown === 0) {
+      const dx = this.player.x - this.shop.x;
+      const dy = this.player.y - this.shop.y;
+      if (Math.abs(dx) < 26 && Math.abs(dy) < 32) {
+        this.openShop();
+      }
     }
 
     // Fall-off-map death

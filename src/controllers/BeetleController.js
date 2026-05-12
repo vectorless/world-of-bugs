@@ -23,6 +23,12 @@ const DASH_COOLDOWN_MS = 420;
 const IFRAME_MS = 700;
 const KNOCKBACK_X = 220;
 const KNOCKBACK_Y = -280;
+// Wall jump: kick off the wall horizontally + upward. Wall slide caps the
+// downward velocity while pressed into a wall so it feels like clinging.
+const WALL_JUMP_VX = 340;
+const WALL_JUMP_VY = -480;
+const WALL_SLIDE_MAX_FALL = 90;
+const WALL_JUMP_LOCKOUT_MS = 140;   // brief lockout so the wall-jump pushes away
 
 export class BeetleController {
   constructor(scene, sprite) {
@@ -37,6 +43,7 @@ export class BeetleController {
     this.dashTimer = 0;         // ms left in current dash
     this.dashCooldown = 0;      // ms left until can dash again
     this.iframes = 0;           // ms left invulnerable
+    this.wallJumpLockout = 0;   // ms during which horizontal input is overridden
     this.dead = false;
   }
 
@@ -54,6 +61,7 @@ export class BeetleController {
     if (this.dashCooldown > 0) this.dashCooldown = Math.max(0, this.dashCooldown - delta);
     if (this.iframes > 0) this.iframes = Math.max(0, this.iframes - delta);
     if (this.jumpBufferTimer > 0) this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - delta);
+    if (this.wallJumpLockout > 0) this.wallJumpLockout = Math.max(0, this.wallJumpLockout - delta);
 
     if (onGround) {
       this.coyoteTimer = COYOTE_MS;
@@ -69,6 +77,10 @@ export class BeetleController {
       // Ignore gravity during dash for a clean horizontal line
       body.setVelocityY(0);
       body.setAllowGravity(false);
+    } else if (this.wallJumpLockout > 0) {
+      // Briefly hold the wall-jump's horizontal kick so the player actually
+      // separates from the wall before they can steer back into it.
+      body.setAllowGravity(true);
     } else {
       body.setAllowGravity(true);
       const speed = input.sprint ? MOVE_SPEED * SPRINT_MULT : MOVE_SPEED;
@@ -76,6 +88,16 @@ export class BeetleController {
       if (input.left)  { vx -= speed; this.facing = -1; }
       if (input.right) { vx += speed; this.facing = 1; }
       body.setVelocityX(vx);
+    }
+
+    // --- Wall slide (cap fall speed while clinging to a wall) ---
+    const againstWall = !onGround && (body.blocked.left || body.blocked.right);
+    if (againstWall
+        && hasAbility(this.registry, 'wallJump')
+        && !this.isDashing()
+        && body.velocity.y > WALL_SLIDE_MAX_FALL
+        && ((body.blocked.left && input.left) || (body.blocked.right && input.right))) {
+      body.setVelocityY(WALL_SLIDE_MAX_FALL);
     }
 
     // --- Jump (buffered + coyote) ---
@@ -86,6 +108,15 @@ export class BeetleController {
         body.setVelocityY(JUMP_VELOCITY);
         this.jumpBufferTimer = 0;
         this.coyoteTimer = 0;
+      } else if (againstWall && hasAbility(this.registry, 'wallJump')) {
+        // Wall jump — kick away from the wall. Re-arm double jump so the
+        // player can chain a wing-flap after a wall kick.
+        const awayDir = body.blocked.left ? 1 : -1;
+        body.setVelocity(awayDir * WALL_JUMP_VX, WALL_JUMP_VY);
+        this.facing = awayDir;
+        this.jumpBufferTimer = 0;
+        this.doubleJumpUsed = false;
+        this.wallJumpLockout = WALL_JUMP_LOCKOUT_MS;
       } else if (hasAbility(this.registry, 'doubleJump') && !this.doubleJumpUsed && !onGround) {
         body.setVelocityY(DOUBLE_JUMP_VELOCITY);
         this.doubleJumpUsed = true;

@@ -13,6 +13,12 @@ export const ABILITIES = {
     icon: 'pickup_bash',
     blurb: 'Press X to dash forward — breaks crumbly walls.',
   },
+  wallJump: {
+    id: 'wallJump',
+    name: 'Wall Cling',
+    icon: 'pickup_walljump',
+    blurb: 'Jump while against a wall to kick off it.',
+  },
 };
 
-export const ABILITY_ORDER = ['doubleJump', 'shellBash'];
+export const ABILITY_ORDER = ['doubleJump', 'shellBash', 'wallJump'];

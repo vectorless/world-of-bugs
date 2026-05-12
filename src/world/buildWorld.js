@@ -105,6 +105,7 @@ export function buildWorld() {
 
   // Lawn entities
   set(3, 17, 'P');             // spawn
+  set(8, 17, 'S');             // shop stall (between spawn and first blade)
   set(17, 17, 'a');            // ant on floor (between blades)
   set(45, 17, 'a');
   set(78, 17, 'a');

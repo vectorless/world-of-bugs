@@ -21,7 +21,7 @@ export function tileAt(grid, x, y) {
 }
 
 export const ENTITY_GLYPHS = new Set([
-  'P', 'D', 'F',
+  'P', 'D', 'F', 'S',
   'a', 's', 'j', 'W',
   'o', 'n', 'w', 'b',
 ]);

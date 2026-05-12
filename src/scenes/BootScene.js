@@ -28,6 +28,8 @@ export class BootScene extends Phaser.Scene {
     makeRect(this, 'pickup_nectar',  14, 14, 0xff70a0);
     makeRect(this, 'pickup_wings',   18, 18, 0x80e0ff);
     makeRect(this, 'pickup_bash',    18, 18, 0xff8040);
+    makeRect(this, 'pickup_walljump',18, 18, 0xa0e060);
+    makeRect(this, 'shop_stall',     28, 36, 0x6a5a30);
 
     this.scene.start('TitleScene');
   }

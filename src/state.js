@@ -50,6 +50,20 @@ export function collectPollen(registry, amount = 1) {
   return next;
 }
 
+export function spendPollen(registry, amount) {
+  const cur = registry.get('pollen') ?? 0;
+  if (cur < amount) return false;
+  registry.set('pollen', cur - amount);
+  return true;
+}
+
+export function increaseMaxHealth(registry, amount = 1) {
+  const max = (registry.get('maxHealth') ?? MAX_HEALTH) + amount;
+  registry.set('maxHealth', max);
+  registry.set('health', max);   // top up to new max
+  return max;
+}
+
 // --- Abilities ------------------------------------------------------------
 
 export function hasAbility(registry, id) {
