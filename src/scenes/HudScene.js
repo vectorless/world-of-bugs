@@ -98,9 +98,13 @@ export class HudScene extends Phaser.Scene {
     const sprintY = jumpY - big - small - 8;
     this.makeBtn(jumpX, sprintY, small, 'RUN', 0xcca050, v => touch.sprint = v);
 
+    let nextActionX = jumpX - big - small - 8;
     if (abilities.has('shellBash')) {
-      const bashX = jumpX - big - small - 8;
-      this.makeBtn(bashX, jumpY, small, 'BASH', 0xc06040, v => touch.dash = v);
+      this.makeBtn(nextActionX, jumpY, small, 'BASH', 0xc06040, v => touch.dash = v);
+      nextActionX -= small * 2 + 8;
+    }
+    if (abilities.has('groundSmash')) {
+      this.makeBtn(nextActionX, jumpY, small, 'SMASH', 0xa060e0, v => touch.smash = v);
     }
 
     // Utility (top-right) — map + pause
