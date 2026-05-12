@@ -200,12 +200,9 @@ export function buildWorld() {
 
   // ---- Enemies along the walking strip (irregular spacing)
   set(12, 37, 's');
-  set(28, 37, 'j');
   set(44, 37, 's');
   set(58, 37, 's');
-  set(73, 37, 'j');
   set(91, 37, 's');
-  set(108, 37, 'j');
 
   // ---- Pollen scattered through the chambers (not on a grid)
   set(6,  25, 'o');
@@ -289,16 +286,9 @@ export function buildWorld() {
   line(103, 53, 3, '#');
   line(113, 51, 4, '#');
 
-  // ---- Lower-route spike pits — only outside the boss-fight zone.
-  // The arena and its approaches (cols ~40-85) are kept fully spike-free
-  // so the dive-and-bash fight can't kill you on a stray hazard.
-  fill(7, 57, 3, 1, '*');
-  fill(14, 57, 4, 1, '*');
-  fill(24, 57, 3, 1, '*');
-  fill(33, 57, 5, 1, '*');
-  fill(92, 57, 4, 1, '*');
-  fill(103, 57, 4, 1, '*');
-  fill(113, 57, 4, 1, '*');
+  // ---- No spike pits in the Thorn — the boss fight area is fully clean
+  // of red killbrick hazards. Thorn pillars and the boss itself still
+  // provide plenty of challenge.
 
   // Boss arena (cols ~57-74) is clear of spikes for the fight.
 
@@ -318,11 +308,7 @@ export function buildWorld() {
   line(118, 53, 4, '#');
   set(120, 52, 'n');           // nectar in the side chamber
 
-  // ---- Enemies: springtails patrolling the lower floor ----
-  set(20, 56, 'j');
-  set(46, 56, 'j');
-  set(72, 56, 'j');
-  set(100, 56, 'j');
+  // (No springtails in the Thorn — the boss fight is the only encounter.)
 
   // ---- Pickups: pollen on the upper ledges, nectar near the boss ----
   set(8, 52, 'o');
@@ -404,8 +390,7 @@ export function buildWorld() {
   set(46, 77, 's');
   set(82, 77, 's');
   set(110, 77, 's');
-  set(30, 70, 'j');             // glittermites on the ledges
-  set(75, 70, 'j');
+  // (No springtails in the Caverns — crystal crawlers only.)
 
   // ---- Pickups — pollen on each ledge plus nectar caches; bonus floor pollen
   set(8, 73, 'o');              // above ledge row 74
