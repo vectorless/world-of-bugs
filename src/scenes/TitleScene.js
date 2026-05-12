@@ -17,25 +17,49 @@ export class TitleScene extends Phaser.Scene {
       fontFamily: 'monospace', fontSize: '16px', color: '#8aa070'
     }).setOrigin(0.5);
 
-    this.add.text(cx, cy + 40, 'Tap or press SPACE to start', {
-      fontFamily: 'monospace', fontSize: '20px', color: '#ffffff'
+    this.add.text(cx, cy + 30, 'Tap or press SPACE for Adventure', {
+      fontFamily: 'monospace', fontSize: '18px', color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.add.text(cx, cy + 90, '←/→ or A/D move   SHIFT sprint   SPACE/W jump   X bash   M map   ESC pause', {
-      fontFamily: 'monospace', fontSize: '12px', color: '#9aa090'
+    const precisionBtn = this.add.text(cx, cy + 70, '[ Precision Mode ]', {
+      fontFamily: 'monospace', fontSize: '16px', color: '#a0e0ff',
+      backgroundColor: '#1a2030', padding: { x: 10, y: 6 },
+    }).setOrigin(0.5);
+    precisionBtn.setInteractive({ useHandCursor: true });
+
+    this.add.text(cx, cy + 110, '←/→ or A/D move   SHIFT sprint   SPACE/W jump   X bash   DOWN smash   M map   ESC pause', {
+      fontFamily: 'monospace', fontSize: '11px', color: '#9aa090'
     }).setOrigin(0.5);
 
     this.scale.on('resize', () => this.scene.restart());
 
-    const start = () => {
-      // First user gesture — safe to bootstrap audio + kick off music.
+    const bootAudio = () => {
       const sounds = getSounds();
       sounds.init();
       sounds.startMusic();
+    };
+
+    const startAdventure = () => {
+      bootAudio();
       this.scene.start('GameScene');
       this.scene.launch('HudScene');
     };
-    this.input.keyboard.once('keydown-SPACE', start);
-    this.input.once('pointerdown', start);
+
+    const startPrecision = () => {
+      bootAudio();
+      this.scene.start('PrecisionScene');
+    };
+
+    this.input.keyboard.once('keydown-SPACE', startAdventure);
+    precisionBtn.on('pointerdown', (pointer) => {
+      pointer.event.stopPropagation?.();
+      startPrecision();
+    });
+
+    // Tap anywhere else (not on the precision button) starts adventure.
+    this.input.on('pointerdown', (pointer, over) => {
+      if (over && over.includes(precisionBtn)) return;
+      startAdventure();
+    });
   }
 }
