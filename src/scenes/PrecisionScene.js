@@ -28,18 +28,20 @@ export class PrecisionScene extends Phaser.Scene {
       a:     'A',    d:     'D',
       jump:  'SPACE',
       w:     'W',
+      down:  'DOWN',
+      s:     'S',
+      dash:  'X',
       pause: 'ESC',
     });
     this.input.keyboard.on('keydown-ESC', () => this.scene.start('TitleScene'));
 
     // Override the adventure abilities/health for this mode — give wall
-    // jump + double jump so the levels can use vertical climbs, and one
-    // hit kills (precision platformers shouldn't have a health bar).
-    this.registry.set('abilities', new Set(['wallJump', 'doubleJump']));
+    // jump, double jump, and shell-bash dash (no smash). One-hit kills.
+    this.registry.set('abilities', new Set(['wallJump', 'doubleJump', 'shellBash']));
     this.registry.set('maxHealth', 1);
     this.registry.set('health', 1);
 
-    this.prevTouch = { jump: false };
+    this.prevTouch = { jump: false, dash: false };
 
     // HUD overlay (scrollFactor 0 so it sticks to the camera)
     this.levelLabel = this.add.text(20, 18, '', {
@@ -168,16 +170,19 @@ export class PrecisionScene extends Phaser.Scene {
     const t = this.registry.get('touchInput') ?? {};
     const jumpKeyDown = Phaser.Input.Keyboard.JustDown(this.keys.jump)
       || Phaser.Input.Keyboard.JustDown(this.keys.w);
+    const dashKeyDown = Phaser.Input.Keyboard.JustDown(this.keys.dash);
     const touchJumpJust = t.jump && !this.prevTouch.jump;
+    const touchDashJust = t.dash && !this.prevTouch.dash;
     this.prevTouch.jump = !!t.jump;
+    this.prevTouch.dash = !!t.dash;
 
     const input = {
       left:  this.keys.left.isDown  || this.keys.a.isDown || !!t.left,
       right: this.keys.right.isDown || this.keys.d.isDown || !!t.right,
-      down:  false,
+      down:  this.keys.down.isDown  || this.keys.s.isDown,
       jumpPressed: jumpKeyDown || touchJumpJust,
       jumpHeld:    this.keys.jump.isDown || this.keys.w.isDown || !!t.jump,
-      dashPressed: false,
+      dashPressed: dashKeyDown || touchDashJust,
       smashPressed: false,
       sprint:      false,
     };
