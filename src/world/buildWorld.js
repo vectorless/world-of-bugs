@@ -387,6 +387,11 @@ export function buildWorld() {
   fill(60, 75, 4, 1, 'x');     // bench platform
   set(62, 74, 'F');             // bench/checkpoint
 
+  // ---- Ground Smash pickup — perched on the easternmost ledge, the
+  // "end" of the ice biome. Player must traverse the Caverns east to
+  // claim it, then come back west to drop into the Burrows.
+  set(114, 72, 'm');
+
   // ---- Enemies — sluggish armored crawlers + leapers
   set(16, 77, 's');             // crystal crawler
   set(46, 77, 's');
@@ -426,7 +431,6 @@ export function buildWorld() {
 
   // ---- Landing ledge: where the player drops in (from cols 4-7).
   fill(2, 82, 8, 1, '#');         // wide landing ledge
-  set(6, 81, 'm');                // Ground Smash pickup right where they land
   set(3, 81, 'F');                // bench on the landing — rest before descent
 
   // ---- Smash-block floors layered at varied heights. Player must use
