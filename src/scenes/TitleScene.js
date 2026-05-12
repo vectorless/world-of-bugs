@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSounds } from '../audio/sound.js';
 
 export class TitleScene extends Phaser.Scene {
   constructor() { super('TitleScene'); }
@@ -27,6 +28,10 @@ export class TitleScene extends Phaser.Scene {
     this.scale.on('resize', () => this.scene.restart());
 
     const start = () => {
+      // First user gesture — safe to bootstrap audio + kick off music.
+      const sounds = getSounds();
+      sounds.init();
+      sounds.startMusic();
       this.scene.start('GameScene');
       this.scene.launch('HudScene');
     };

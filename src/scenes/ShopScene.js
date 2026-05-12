@@ -73,6 +73,13 @@ export class ShopScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ESC', close);
     this.input.keyboard.on('keydown-UP', close);
     this.input.keyboard.on('keydown-E', close);
+
+    // Tap on the dim background (anywhere outside an item row) closes
+    // the shop. Item rows are interactive, so taps on them are consumed
+    // by the buy handler and won't fire here.
+    this.input.on('pointerdown', (pointer, over) => {
+      if (!over || over.length === 0) close();
+    });
   }
 
   refreshPollenLabel() {

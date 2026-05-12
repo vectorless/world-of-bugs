@@ -1,4 +1,5 @@
 import { hasAbility } from '../state.js';
+import { getSounds } from '../audio/sound.js';
 
 // Drives the beetle physics sprite. Decoupled from input source: GameScene
 // builds an input bag each frame and hands it in.
@@ -108,6 +109,7 @@ export class BeetleController {
         body.setVelocityY(JUMP_VELOCITY);
         this.jumpBufferTimer = 0;
         this.coyoteTimer = 0;
+        getSounds().swoosh();
       } else if (againstWall && hasAbility(this.registry, 'wallJump')) {
         // Wall jump — kick away from the wall. Re-arm double jump so the
         // player can chain a wing-flap after a wall kick.
@@ -117,10 +119,12 @@ export class BeetleController {
         this.jumpBufferTimer = 0;
         this.doubleJumpUsed = false;
         this.wallJumpLockout = WALL_JUMP_LOCKOUT_MS;
+        getSounds().swoosh();
       } else if (hasAbility(this.registry, 'doubleJump') && !this.doubleJumpUsed && !onGround) {
         body.setVelocityY(DOUBLE_JUMP_VELOCITY);
         this.doubleJumpUsed = true;
         this.jumpBufferTimer = 0;
+        getSounds().swoosh();
       }
     }
 
@@ -137,6 +141,7 @@ export class BeetleController {
       this.dashTimer = DASH_DURATION_MS;
       this.dashCooldown = DASH_COOLDOWN_MS;
       this.iframes = Math.max(this.iframes, DASH_DURATION_MS);
+      getSounds().dashSwoosh();
     }
 
     // --- Flicker while invulnerable ---
