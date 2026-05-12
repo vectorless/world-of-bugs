@@ -41,7 +41,7 @@ export const ENEMIES = {
     type: 'waspQueen',
     ai: 'boss',
     texture: 'wasp',
-    hp: 3,
+    hp: 2,
     speed: 0,
     contactDamage: 1,
     requiresBash: true,

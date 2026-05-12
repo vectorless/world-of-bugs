@@ -210,7 +210,7 @@ export class GameScene extends Phaser.Scene {
           const t = this.time.now * 0.003;
           body.setVelocity((homeX - sprite.x) * 2 + Math.sin(t) * 30, (homeY - sprite.y) * 2 + Math.cos(t * 1.3) * 20);
           if (state.timer <= 0) {
-            state.phase = 1; state.timer = 600;
+            state.phase = 1; state.timer = 950;       // longer telegraph (reaction time)
             sprite.setTint(0xffff80);
             state.diveTarget = { x: this.player.x, y: this.player.y };
           }
@@ -220,11 +220,11 @@ export class GameScene extends Phaser.Scene {
             state.phase = 2; state.timer = 900;
             sprite.clearTint(); sprite.setTint(0xff8040);
             body.setAllowGravity(true);
-            body.setVelocity(0, 700);
+            body.setVelocity(0, 620);                // slightly slower dive
           }
         } else if (state.phase === 2) {
           if (body.onFloor() || state.timer <= 0) {
-            state.phase = 3; state.timer = 900;
+            state.phase = 3; state.timer = 1500;     // longer expose — more time to bash
             body.setAllowGravity(false);
             body.setVelocity(0, 0);
             sprite.clearTint(); sprite.setTint(0x88ff88);
@@ -233,7 +233,7 @@ export class GameScene extends Phaser.Scene {
           body.setVelocity(0, 0);
           if (state.timer <= 0) {
             state.phase = 0;
-            state.timer = Math.max(700, 1800 - state.hits * 350);
+            state.timer = Math.max(1100, 2200 - state.hits * 300);  // longer hover between dives
             sprite.clearTint();
             body.setAllowGravity(false);
           }

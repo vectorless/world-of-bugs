@@ -122,100 +122,113 @@ export function buildWorld() {
   set(118, 17, 'o');
 
   // =====================================================================
-  // HOLLOW (rows 19-38) — TUNNEL SYSTEM
-  // Carved from solid dirt: a top tunnel, a middle tunnel, and a lower
-  // chamber, all connected by vertical shafts. The player picks routes
-  // through the maze: high path is fast, low path has enemies + loot.
+  // HOLLOW (rows 19-38) — IRREGULAR CAVE SYSTEM
+  // Instead of three neatly-stacked corridors, the hollow is now a tangle
+  // of mismatched chambers and zig-zag passages carved at varied heights.
+  // No two openings line up. The player wanders rather than walks.
   // =====================================================================
 
-  // Top tunnel (rows 22-24, 3 tiles tall, runs almost the full width)
-  carve(4, 22, 121, 3);
-
-  // Middle tunnel (rows 27-29)
-  carve(4, 27, 121, 3);
-
-  // Lower chamber (rows 33-37, 5 tiles tall — more headroom for combat)
+  // Lower walking strip (always carved so the player has a continuous
+  // path along the floor)
   carve(4, 33, 121, 5);
-
-  // Hollow floor (row 38, solid dirt walkway)
   line(1, 38, W - 2, '#');
 
-  // ---- Vertical shafts connecting the corridors (junctions) ----
-  // Each shaft is 2 wide so the player has space to land/jump cleanly.
-  // Different shafts connect different tunnels — picking the right one
-  // matters.
-  fill(10, 22, 2, 16, '.');    // FULL shaft (top→middle→lower→floor)
-  fill(28, 22, 2, 7, '.');     // top→middle only
-  fill(40, 27, 2, 11, '.');    // middle→lower→floor
-  fill(58, 22, 2, 16, '.');    // FULL shaft
-  fill(70, 27, 2, 6, '.');     // middle→lower only
-  fill(82, 22, 2, 16, '.');    // FULL shaft
-  fill(96, 22, 2, 7, '.');     // top→middle
-  fill(108, 27, 2, 11, '.');   // middle→lower→floor
+  // Scatter of mid-height chambers and pockets (rows 20-32). Each is its
+  // own blob, intentionally at different heights and widths.
+  carve(4, 24, 10, 4, '.');     // west chamber (high)
+  carve(16, 20, 6, 6, '.');     // tall narrow alcove
+  carve(23, 27, 9, 4, '.');     // mid-west pocket
+  carve(33, 22, 12, 5, '.');    // bigger central chamber (high)
+  carve(43, 29, 8, 3, '.');     // shelf chamber
+  carve(54, 24, 7, 8, '.');     // tall central column-room
+  carve(63, 21, 10, 4, '.');    // mid-east high
+  carve(75, 26, 6, 6, '.');     // mid-east mid
+  carve(83, 22, 11, 3, '.');    // long high tunnel
+  carve(86, 30, 8, 3, '.');     // east shelf
+  carve(98, 25, 9, 7, '.');     // big east chamber
+  carve(110, 21, 11, 5, '.');   // east-most pocket
+
+  // Twisty connecting tunnels at non-uniform heights
+  carve(13, 26, 4, 2, '.');     // west chamber → west pocket
+  carve(22, 24, 3, 4, '.');     // pocket → middle alcove
+  carve(31, 25, 3, 3, '.');
+  carve(45, 26, 3, 4, '.');
+  carve(51, 28, 5, 2, '.');
+  carve(61, 29, 4, 4, '.');
+  carve(73, 24, 3, 3, '.');
+  carve(81, 25, 3, 3, '.');
+  carve(94, 28, 5, 2, '.');
+  carve(107, 24, 4, 3, '.');
+
+  // Vertical chimneys connecting some chambers down to the lower walking
+  // strip (irregular spacings, varying widths)
+  fill(8,  27, 2, 11, '.');
+  fill(19, 25, 2, 13, '.');
+  fill(36, 26, 3, 12, '.');
+  fill(48, 32, 2, 6, '.');
+  fill(56, 31, 2, 7, '.');
+  fill(67, 24, 2, 14, '.');
+  fill(89, 25, 3, 13, '.');
+  fill(102, 31, 2, 7, '.');
+  fill(115, 25, 2, 13, '.');
 
   // Lawn-to-hollow descent shaft (must clear everything in its path)
   fill(122, 19, 4, 19, '.');
 
-  // ---- Bash pickup chamber — a small alcove off the middle tunnel ----
-  // Accessible by walking west along the middle tunnel from any junction.
-  carve(14, 30, 5, 3, '.');    // sunken alcove below middle tunnel
-  line(14, 33, 5, '#');        // floor of the alcove
-  set(16, 32, 'b');            // bash pickup
-  set(15, 32, 'n');            // nectar by the bash
+  // ---- Bash pickup tucked into the WEST chamber (scattered placement)
+  set(7, 26, 'b');
+  set(10, 26, 'n');
 
-  // ---- Secret chamber off the TOP tunnel (bonus loot) ----
-  // Reachable only via the upper route — a reward for taking the high path.
-  carve(48, 19, 8, 3, '.');    // ceiling pocket above the top tunnel
-  set(50, 20, 'n');
-  set(53, 20, 'o');
+  // ---- A few hidden ceiling pockets at random spots, for surprise loot
+  carve(40, 19, 4, 2, '.');
+  set(41, 20, 'o'); set(42, 20, 'n');
+  carve(70, 19, 5, 2, '.');
+  set(72, 20, 'o');
+  carve(105, 19, 4, 2, '.');
+  set(106, 20, 'o'); set(107, 20, 'n');
 
-  // ---- Hollow pillars / overhangs giving the tunnels character ----
-  // These are inside the carved tunnels, narrowing them into bottlenecks
-  // the player threads through.
-  set(20, 23, '#'); set(20, 24, '#');   // mini pillar in top tunnel
-  set(36, 28, '#'); set(36, 29, '#');   // mini pillar in middle tunnel
-  set(46, 23, '#');                     // overhang in top tunnel
-  set(64, 28, '#');
-  set(76, 23, '#'); set(76, 24, '#');
-  set(88, 28, '#');
-  set(102, 23, '#');
-  set(116, 28, '#');
+  // ---- Bouncy mushrooms on the walking strip at uneven intervals
+  set(5,  37, '~');
+  set(22, 37, '~');
+  set(39, 37, '~');
+  set(55, 37, '~');
+  set(64, 37, '~');
+  set(81, 37, '~');
+  set(100, 37, '~');
+  set(118, 37, '~');
+  set(123, 37, '~');           // under the descent shaft
 
-  // ---- Bouncy mushrooms in the lower chamber (boost up to upper tunnels)
-  set(6, 37, '~');
-  set(24, 37, '~');
-  set(44, 37, '~');
-  set(62, 37, '~');
-  set(78, 37, '~');
-  set(94, 37, '~');
-  set(112, 37, '~');
-  set(123, 37, '~');           // under descent shaft for return travel
+  // ---- Enemies along the walking strip (irregular spacing)
+  set(12, 37, 's');
+  set(28, 37, 'j');
+  set(44, 37, 's');
+  set(58, 37, 's');
+  set(73, 37, 'j');
+  set(91, 37, 's');
+  set(108, 37, 'j');
 
-  // ---- Enemies along the lower chamber (low route is dangerous) ----
-  set(15, 37, 's');            // snail
-  set(32, 37, 'j');            // springtail
-  set(48, 37, 's');
-  set(66, 37, 'j');
-  set(85, 37, 's');
-  set(100, 37, 'j');
-  set(115, 37, 'j');
+  // ---- Pollen scattered through the chambers (not on a grid)
+  set(6,  25, 'o');
+  set(17, 22, 'o');
+  set(26, 29, 'o');
+  set(36, 23, 'o');
+  set(44, 30, 'o');
+  set(55, 25, 'o');
+  set(58, 28, 'o');
+  set(66, 22, 'o');
+  set(78, 28, 'o');
+  set(86, 23, 'o');
+  set(88, 31, 'o');
+  set(99, 26, 'o');
+  set(104, 30, 'o');
+  set(112, 22, 'o');
+  set(117, 24, 'n');           // hidden nectar in the eastmost pocket
 
-  // Sprinkle of pollen along each tunnel
-  set(8, 23, 'o');             // top tunnel
-  set(34, 23, 'o');
-  set(68, 23, 'o');
-  set(98, 23, 'o');
-
-  set(12, 28, 'o');            // middle tunnel
-  set(32, 28, 'o');
-  set(60, 28, 'o');
-  set(92, 28, 'o');
-  set(112, 28, 'o');
-
-  set(20, 37, 'o');            // lower chamber floor
-  set(50, 37, 'o');
-  set(75, 37, 'o');
-  set(105, 37, 'n');           // nectar mid-floor
+  // A few pollen on the walking strip too
+  set(16, 37, 'o');
+  set(48, 37, 'o');
+  set(76, 37, 'o');
+  set(110, 37, 'n');
 
   // =====================================================================
   // HOLLOW→THORN CRUMBLE GATE
@@ -246,17 +259,22 @@ export function buildWorld() {
   fill(92, 39, 4, 6, '#');
   fill(112, 39, 4, 5, '#');
 
-  // ---- Thorn pillars from the floor — solid walls in tight packing ----
-  fill(10, 42, 3, 14, 'T');
-  fill(20, 46, 3, 10, 'T');
-  fill(28, 42, 3, 14, 'T');
-  fill(40, 45, 3, 11, 'T');
+  // ---- Thorn pillars from the floor — uneven heights, irregular spacing
+  fill(10, 41, 2, 15, 'T');
+  fill(17, 49, 4, 7, 'T');
+  fill(23, 44, 2, 12, 'T');
+  fill(31, 47, 3, 9, 'T');
+  fill(37, 41, 2, 15, 'T');
+  fill(42, 50, 3, 6, 'T');
   fill(54, 47, 3, 8, 'T');     // smaller pillar (boss arena west wall)
   fill(75, 47, 3, 8, 'T');     // boss arena east wall
-  fill(85, 45, 3, 11, 'T');
-  fill(97, 42, 3, 14, 'T');
-  fill(108, 46, 3, 10, 'T');
-  fill(118, 42, 3, 13, 'T');
+  fill(82, 43, 2, 13, 'T');
+  fill(87, 49, 4, 7, 'T');
+  fill(95, 41, 3, 15, 'T');
+  fill(101, 50, 2, 6, 'T');
+  fill(108, 44, 4, 12, 'T');
+  fill(116, 47, 2, 9, 'T');
+  fill(120, 41, 3, 15, 'T');
 
   // ---- Upper-route ledges (small platforms above each spike pit).
   // Two-tier hopping: floor ↔ ledge ↔ floor pattern weaves through the
