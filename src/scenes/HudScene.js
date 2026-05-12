@@ -75,10 +75,10 @@ export class HudScene extends Phaser.Scene {
     // viewports get smaller buttons that don't overlap. iPad (~768px short
     // side) gets full-size buttons; phone (~375px) gets compact ones.
     const base = Math.min(width, height);
-    const r     = Math.max(26, Math.min(48, Math.floor(base / 16)));
-    const big   = Math.floor(r * 1.18);
-    const small = Math.floor(r * 0.78);
-    const util  = Math.max(20, Math.floor(r * 0.62));
+    const r     = Math.max(36, Math.min(68, Math.floor(base / 11)));
+    const big   = Math.floor(r * 1.22);
+    const small = Math.floor(r * 0.82);
+    const util  = Math.max(26, Math.floor(r * 0.66));
     // Generous bottom/edge padding keeps buttons clear of iPhone's home
     // indicator gesture zone and any residual notch area on landscape.
     const pad   = Math.max(22, Math.floor(r * 0.55));
@@ -117,8 +117,11 @@ export class HudScene extends Phaser.Scene {
     circle.setStrokeStyle(2, 0xffffff, 0.55);
     circle.setInteractive({ useHandCursor: true });
 
+    const fs = label.length > 1
+      ? Math.max(14, Math.floor(r * 0.42))
+      : Math.max(20, Math.floor(r * 0.62));
     const text = this.add.text(x, y, label, {
-      fontFamily: 'monospace', fontSize: label.length > 1 ? '16px' : '24px',
+      fontFamily: 'monospace', fontSize: `${fs}px`,
       color: '#ffffff',
     }).setOrigin(0.5);
 
