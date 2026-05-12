@@ -218,7 +218,7 @@ export class GameScene extends Phaser.Scene {
           body.setVelocity((state.diveTarget.x - sprite.x) * 3, (homeY - sprite.y) * 2);
           if (state.timer <= 0) {
             state.phase = 2; state.timer = 900;
-            sprite.clearTint(); sprite.setTint(0xff8040);
+            sprite.clearTint(); sprite.setTint(0x60a0ff);   // blue dive — no red on the queen
             body.setAllowGravity(true);
             body.setVelocity(0, 620);                // slightly slower dive
           }
