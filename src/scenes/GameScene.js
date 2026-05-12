@@ -206,7 +206,7 @@ export class GameScene extends Phaser.Scene {
     sprite.body.setSize(sprite.width - 4, sprite.height - 4);
     const homeX = sprite.x;
     const homeY = sprite.y;
-    const state = { phase: 0, timer: 1500, diveTarget: null, hits: 0 };
+    const state = { phase: 0, timer: 700, diveTarget: null, hits: 0 };
     return {
       kind: 'boss',
       state,
@@ -215,24 +215,26 @@ export class GameScene extends Phaser.Scene {
         state.timer -= delta;
 
         if (state.phase === 0) {
-          const t = this.time.now * 0.003;
-          body.setVelocity((homeX - sprite.x) * 2 + Math.sin(t) * 30, (homeY - sprite.y) * 2 + Math.cos(t * 1.3) * 20);
+          // Faster, wider hover wobble — feels jittery and aggressive.
+          const t = this.time.now * 0.005;
+          body.setVelocity((homeX - sprite.x) * 3 + Math.sin(t) * 70, (homeY - sprite.y) * 3 + Math.cos(t * 1.3) * 50);
           if (state.timer <= 0) {
-            state.phase = 1; state.timer = 950;       // longer telegraph (reaction time)
+            state.phase = 1; state.timer = 320;          // BUFF: brutally short telegraph
             sprite.setTint(0xffff80);
             state.diveTarget = { x: this.player.x, y: this.player.y };
           }
         } else if (state.phase === 1) {
-          body.setVelocity((state.diveTarget.x - sprite.x) * 3, (homeY - sprite.y) * 2);
+          // Tracks the player tighter during telegraph
+          body.setVelocity((state.diveTarget.x - sprite.x) * 4, (homeY - sprite.y) * 2);
           if (state.timer <= 0) {
             state.phase = 2; state.timer = 900;
-            sprite.clearTint(); sprite.setTint(0x60a0ff);   // blue dive — no red on the queen
+            sprite.clearTint(); sprite.setTint(0x60a0ff);
             body.setAllowGravity(true);
-            body.setVelocity(0, 620);                // slightly slower dive
+            body.setVelocity(0, 1000);                   // BUFF: much faster dive
           }
         } else if (state.phase === 2) {
           if (body.onFloor() || state.timer <= 0) {
-            state.phase = 3; state.timer = 1500;     // longer expose — more time to bash
+            state.phase = 3; state.timer = 500;          // BUFF: tiny expose window
             body.setAllowGravity(false);
             body.setVelocity(0, 0);
             sprite.clearTint(); sprite.setTint(0x88ff88);
@@ -241,7 +243,8 @@ export class GameScene extends Phaser.Scene {
           body.setVelocity(0, 0);
           if (state.timer <= 0) {
             state.phase = 0;
-            state.timer = Math.max(1100, 2200 - state.hits * 300);  // longer hover between dives
+            // BUFF: tight cycle that gets even faster as she takes hits
+            state.timer = Math.max(400, 900 - state.hits * 120);
             sprite.clearTint();
             body.setAllowGravity(false);
           }

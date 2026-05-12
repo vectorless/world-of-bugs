@@ -41,9 +41,9 @@ export const ENEMIES = {
     type: 'waspQueen',
     ai: 'boss',
     texture: 'wasp',
-    hp: 2,
+    hp: 6,                  // significantly tougher
     speed: 0,
-    contactDamage: 1,
+    contactDamage: 2,       // double damage on contact
     requiresBash: true,
   },
   burrowerQueen: {
