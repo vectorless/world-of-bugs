@@ -21,7 +21,7 @@ class SoundController {
     if (!Ctx) return;
     this.ctx = new Ctx();
     this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.value = 0.7;
+    this.masterGain.gain.value = 1.0;
     this.masterGain.connect(this.ctx.destination);
     if (this.ctx.state === 'suspended') this.ctx.resume();
   }
@@ -104,7 +104,7 @@ class SoundController {
 
     this.musicGain = this.ctx.createGain();
     this.musicGain.gain.value = 0.0001;
-    this.musicGain.gain.exponentialRampToValueAtTime(0.18, this.ctx.currentTime + 2);
+    this.musicGain.gain.exponentialRampToValueAtTime(0.6, this.ctx.currentTime + 2);
     this.musicGain.connect(this.masterGain);
 
     // Sustained drone chord: A2, E3, C4 (A minor)

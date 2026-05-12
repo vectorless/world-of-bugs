@@ -29,8 +29,12 @@ export class ShopScene extends Phaser.Scene {
   create() {
     const { width: sw, height: sh } = this.scale;
 
-    // Dim the world below
-    this.add.rectangle(0, 0, sw, sh, 0x000000, 0.78).setOrigin(0);
+    // Dim the world below — interactive so taps on the dim area close the
+    // shop. Item rows are added later (on top) so taps on them are
+    // consumed by their own buy handler instead.
+    const overlay = this.add.rectangle(0, 0, sw, sh, 0x000000, 0.78).setOrigin(0);
+    overlay.setInteractive();
+    overlay.on('pointerdown', () => this.closeShop());
 
     // Panel
     const panelW = Math.min(440, sw - 40);
@@ -73,13 +77,6 @@ export class ShopScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ESC', close);
     this.input.keyboard.on('keydown-UP', close);
     this.input.keyboard.on('keydown-E', close);
-
-    // Tap on the dim background (anywhere outside an item row) closes
-    // the shop. Item rows are interactive, so taps on them are consumed
-    // by the buy handler and won't fire here.
-    this.input.on('pointerdown', (pointer, over) => {
-      if (!over || over.length === 0) close();
-    });
   }
 
   refreshPollenLabel() {
