@@ -1,7 +1,7 @@
 // All progression state lives on scene.registry. Mutators here are the only
 // callers of registry.set, so scenes never touch keys directly.
 
-export const MAX_HEALTH = 3;
+export const MAX_HEALTH = 5;
 
 export function initState(registry) {
   registry.set('health', MAX_HEALTH);
