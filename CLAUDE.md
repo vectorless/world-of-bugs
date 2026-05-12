@@ -4,11 +4,11 @@ A beetle metroidvania. One big interconnected underground world, three biomes st
 
 ## Loop
 
-The whole game runs on a single 80×50-tile world (built procedurally in `src/world/buildWorld.js`). No room transitions — the camera smoothly follows the beetle anywhere on the map.
+The whole game runs on a single 130×60-tile world (built procedurally in `src/world/buildWorld.js`). No room transitions — the camera smoothly follows the beetle anywhere on the map. Each biome has at least one branching path (a "low route" along the floor and a "high route" with bonus pickups) so the player can choose how to approach each crossing.
 
-1. **The Lawn** (rows 1–14) — grass floor with stepping platforms, dewdrop pollen, patrol ants. **Dewdrop Wings** sits on a high ledge mid-Lawn. A 5-tile-tall wall on the east end requires double-jump to clear; past it is the descent shaft into the Hollow.
-2. **The Mushroom Hollow** (rows 15–29) — tunnel-y chamber with dirt pillars, bouncy mushrooms (`~`), armored snails (`s`), and leaping springtails (`j`). **Shell Bash** sits on a ledge on the west side. A vertical crumble wall (`C`) blocks the east passage to the Thorn descent shaft.
-3. **The Thorn Thicket** (rows 30–48) — spike-laden corridors flanked by thorn pillars. A checkpoint (`F`) marks the safe zone near the entrance. The **Wasp Queen** waits in the central arena. Boss has three phases: hover → telegraph dive (yellow tint) → dive (orange) → land/expose (green, vulnerable to shell-bash). Three bashes during the expose window wins.
+1. **The Lawn** (rows 1–18) — grass floor with stepping platforms, dewdrop pollen, patrol ants. **Dewdrop Wings** sits on a high ledge mid-Lawn. After wings, a meandering **high canopy** of treetop platforms offers bonus pollen/nectar. A 5-tile-tall wall on the east end requires double-jump to clear; past it is the descent shaft into the Hollow.
+2. **The Mushroom Hollow** (rows 19–38) — winding tunnel chamber with dirt overhangs, bouncy mushrooms (`~`), armored snails (`s`), and leaping springtails (`j`). The floor (low route) has enemies; a parallel **upper tunnel** threads ceiling platforms reachable via mushrooms. **Shell Bash** sits on a ledge on the west side. A vertical crumble wall (`C`) on the far east blocks descent to Thorn until bashed.
+3. **The Thorn Thicket** (rows 39–58) — spike-laden corridors flanked by thorn pillars. Each spike pit has a small **upper ledge** floating above it, letting the player either jump the spikes from the floor or hop ledge-to-ledge above them. A checkpoint (`F`) marks the safe zone near the entrance. The **Wasp Queen** waits in the central arena. Boss has three phases: hover → telegraph dive (yellow tint) → dive (orange) → land/expose (green, vulnerable to shell-bash). Three bashes during the expose window wins.
 
 ## Controls
 
@@ -41,8 +41,8 @@ Pressing `M` overlays a fog-of-war minimap. Tiles you've been within ~7 tiles of
 
 ## Architecture invariants — keep these
 
-- **One big world, not multiple rooms.** The whole map lives in `src/world/buildWorld.js`. It's still parsed by `src/world/Room.js`, which the rest of the engine treats as a single Room. There are no door transitions; the camera follows the beetle smoothly across the entire 80×50 grid.
-- **Map is built programmatically.** Don't hand-edit huge string arrays — edit `buildWorld.js`'s helper calls (`carve`, `fill`, `line`, `set`). Three biome bands are stacked vertically: Lawn 1–14, Hollow 15–29, Thorn 30–48. Outer borders are re-affirmed at the end so nothing leaks.
+- **One big world, not multiple rooms.** The whole map lives in `src/world/buildWorld.js`. It's still parsed by `src/world/Room.js`, which the rest of the engine treats as a single Room. There are no door transitions; the camera follows the beetle smoothly across the entire 130×60 grid.
+- **Map is built programmatically.** Don't hand-edit huge string arrays — edit `buildWorld.js`'s helper calls (`carve`, `fill`, `line`, `set`). Three biome bands are stacked vertically: Lawn 1–18, Hollow 19–38, Thorn 39–58. Each biome has a low-route/high-route fork that converges at the next ability gate. Outer borders are re-affirmed at the end so nothing leaks.
 - **Phaser scenes are modes.** `GameScene` runs the world; `HudScene` persists; `PauseScene` overlays on `ESC`; `MapScene` overlays on `M`; `WinScene` overlays on boss defeat. `BootScene` generates placeholder textures procedurally and hands off to `TitleScene`.
 - **Game state lives on `scene.registry`** — `health`, `maxHealth`, `pollen`, `abilities` (Set of ids), `collected` (Set of `entityId`), `brokenWalls` (Set of `"x,y"`), `explored` (Set of `"tx,ty"`), `checkpoint` ({x, y} pixel coords or null), `won`. Mutators in `src/state.js`. The `explored` Set is mutated in place (no `registry.set` on each tile) to avoid event spam.
 - **Content is data, not classes.** `src/data/{abilities,enemies,collectibles,zones}.js` are the only files to touch for tuning. Adding a new enemy type is an entry in `enemies.js` + an AI case in `GameScene.makeAi`.
