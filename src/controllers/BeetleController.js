@@ -1,5 +1,6 @@
 import { hasAbility } from '../state.js';
 import { getSounds } from '../audio/sound.js';
+import { TILE_SIZE } from '../world/tiles.js';
 
 // Drives the beetle physics sprite. Decoupled from input source: GameScene
 // builds an input bag each frame and hands it in.
@@ -201,6 +202,32 @@ export class BeetleController {
 
     // --- Flicker while invulnerable ---
     this.sprite.setAlpha(this.iframes > 0 ? (Math.floor(this.iframes / 60) % 2 ? 0.4 : 1) : 1);
+
+    // Safety: if a high-speed dash/smash ended with the player center stuck
+    // inside a solid tile, push them out to the nearest empty tile above.
+    this.snapOutOfSolids();
+  }
+
+  snapOutOfSolids() {
+    if (this.isDashing() || this.smashing) return;
+    const room = this.scene.room;
+    if (!room) return;
+    const tx = Math.floor(this.sprite.x / TILE_SIZE);
+    const ty = Math.floor(this.sprite.y / TILE_SIZE);
+    if (!room.hasSolidAtTile(tx, ty)) return;
+    for (let dy = 0; dy <= 4; dy++) {
+      for (let dx = 0; dx <= 3; dx++) {
+        for (const sx of [dx, -dx]) {
+          if (!room.hasSolidAtTile(tx + sx, ty - dy)) {
+            this.sprite.body.reset(
+              (tx + sx) * TILE_SIZE + TILE_SIZE / 2,
+              (ty - dy) * TILE_SIZE + TILE_SIZE / 2,
+            );
+            return;
+          }
+        }
+      }
+    }
   }
 
   // Called by GameScene on enemy contact; returns true if damage applied.

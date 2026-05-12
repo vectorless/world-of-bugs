@@ -97,10 +97,11 @@ export function buildWorld() {
   set(96, 3, 'o');
   set(106, 5, 'o');
 
-  // ---- Wings-gate wall: 5-tile-tall block on east lawn ----
+  // ---- Wings-gate wall: 5-tile-tall × 4-wide block on east lawn ----
   // Approach from the floor requires double-jump to clear. Canopy walkers
-  // sail over it.
-  fill(108, 14, 2, 5, '#');
+  // sail over it. Bumped to 4 tiles wide so a horizontal shell-bash
+  // (max dash ≈ 2.9 tiles) can't punch all the way through.
+  fill(106, 14, 4, 5, '#');
 
   // ---- East lawn run-up and descent shaft ----
   fill(122, 8, 4, 11, '.');    // shaft from row 8 down through floor row 18
@@ -410,9 +411,10 @@ export function buildWorld() {
   set(102, 77, 'o');
   set(120, 77, 'o');
 
-  // ---- Smash-block barrier in the Caverns floor — opens after Wasp Queen
-  // is defeated, dropping into the Burrows. Locked closed otherwise.
-  fill(4, 78, 4, 1, 'B');
+  // ---- Open descent into the Burrows on the west of the Caverns floor.
+  // (No gate — players reach this after exploring the Caverns, and finding
+  // a smash-block barrier here just confused people.)
+  fill(4, 78, 4, 1, '.');
 
   // =====================================================================
   // BURROWS (rows 79-97 open, row 98 floor) — deep dirt warrens beneath
