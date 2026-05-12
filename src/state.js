@@ -7,7 +7,7 @@ export function initState(registry) {
   registry.set('health', MAX_HEALTH);
   registry.set('maxHealth', MAX_HEALTH);
   registry.set('pollen', 0);
-  registry.set('abilities', new Set());      // 'doubleJump' | 'shellBash'
+  registry.set('abilities', new Set(['wallJump']));  // wall-cling is innate; wings/bash unlocked later
   registry.set('collected', new Set());      // entityIds of consumed pickups
   registry.set('brokenWalls', new Set());    // `${x},${y}` for shell-bashed crumbles
   registry.set('explored', new Set());       // `${tx},${ty}` tile coords seen
